@@ -1,3 +1,8 @@
+export enum RoomEvent {
+  UserJoin = 'join',
+  UserDisconnect = 'disconnect',
+}
+
 export enum PlayerEvent {
   Ready = 'ready-player',
   Start = 'start-player',
