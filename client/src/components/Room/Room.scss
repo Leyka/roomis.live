@@ -1,0 +1,42 @@
+.room {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .room__header {
+    grid-area: header;
+    padding: 20px 0;
+  }
+
+  .room__main {
+    grid-area: main;
+  }
+
+  .room__playlist {
+    grid-area: playlist;
+  }
+
+  .room__chat {
+    grid-area: chat;
+  }
+}
+
+// Desktop
+@media only screen and (min-width: 768px) {
+  .room {
+    display: grid;
+    grid-template-columns: 250px 2fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-column-gap: 10px;
+    grid-template-areas:
+      'header header header'
+      'playlist main chat';
+  }
+}
+
+// Mobile
+@media only screen and (max-width: 768px) {
+  .room__player {
+    height: 50vh;
+  }
+}
