@@ -1,14 +1,19 @@
 version: '3.7'
 services:
-  # server:
-  #   build: .
-  #   ports:
-  #     - 5000:5000
-  #   volumes:
-  #     - .:/usr/src/app
-  #   depends_on:
-  #     - redis
   redis:
     image: redis:alpine
+    container_name: redis
+    hostname: redis
     ports:
       - 6379:6379
+  redis-commander:
+    image: rediscommander/redis-commander
+    container_name: redis-commander
+    hostname: redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis

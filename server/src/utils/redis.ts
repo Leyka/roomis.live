@@ -4,10 +4,6 @@ import * as Redis from 'ioredis';
 export const redis = new Redis();
 
 export module RedisManager {
-  export function isStarted() {
-    return !!redis;
-  }
-
   /** Format key name to turns into "type:key" format
    * Example {type: 'room', key: 'music'} will returns 'room:music' */
   export function formatKey(type: string, key: string) {
