@@ -1,7 +1,7 @@
-export interface Player {
-  videoUrl: string;
-  currentTimeSec: number;
+export interface LivePlayer {
+  videoId: string;
   isPlaying: boolean;
+  timeProgressSec: number;
   lastTimeCheck: Date;
 }
 
@@ -19,9 +19,9 @@ export interface Video {
 
 export interface User {
   id: string;
-  ip?: string;
   name: string;
   room: string;
+  ip?: string;
 }
 
 export type PlaylistQueue = {
@@ -40,7 +40,3 @@ export interface Room {
   queue?: PlaylistQueue;
   currentPlayingId?: string;
 }
-
-export type Rooms = {
-  [name: string]: Room;
-};

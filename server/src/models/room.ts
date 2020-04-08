@@ -25,14 +25,20 @@ class RoomManager implements Manager<Room> {
 
     delete room.users[userId];
 
+    // It was last user? Then delete room
     const roomIsEmpty = Object.keys(room.users).length === 0;
     if (roomIsEmpty) {
-      // Delete room if it's last user
       this.remove(name);
       return;
     }
 
-    // Otherwise, returns the room without that user
+    // We still have users in this room at this point
+    // Check if it's the host who left. If so, transfer host rights to next user
+    if (userId === room.hostUserId) {
+      const nextUserId = Object.keys(room.users)[0];
+      room.hostUserId = nextUserId;
+    }
+
     this.save(room);
     return room;
   }
