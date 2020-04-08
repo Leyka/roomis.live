@@ -12,10 +12,11 @@ export async function onRoomJoin(socket: Socket, roomName: string, userName?: st
 }
 
 export async function onRoomDisconnect(socket: Socket) {
-  const user = await userManager.getUser(socket.id);
+  const user = await userManager.get(socket.id);
   if (user) {
     await roomManager.leave(user.room, user.id);
-    await userManager.removeUser(user.id);
+    await userManager.remove(user.id);
+
     logger.info(`User ${JSON.stringify(user)} joined room ${user.room}`);
   }
 }

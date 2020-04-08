@@ -1,10 +1,12 @@
+import { kebabCase } from 'lodash';
 import { Room, User } from '../../../shared/types';
 import { RedisManager } from '../utils/redis';
+import { Manager } from './types';
 
-class RoomManager {
+class RoomManager implements Manager<Room> {
   /** Create or update room when user joins */
   async join(name: string, user: User) {
-    let room = await this.getRoom(name);
+    let room = await this.get(name);
     if (room) {
       // Existing room, add new user
       room.users[user.id] = user;
@@ -13,12 +15,12 @@ class RoomManager {
       room = this.createRoom(name, user);
     }
 
-    this.saveRoom(room);
+    this.save(room);
     return room;
   }
 
   async leave(name: string, userId: string) {
-    let room = await this.getRoom(name);
+    let room = await this.get(name);
     if (!room) return;
 
     delete room.users[userId];
@@ -26,27 +28,27 @@ class RoomManager {
     const roomIsEmpty = Object.keys(room.users).length === 0;
     if (roomIsEmpty) {
       // Delete room if it's last user
-      this.removeRoom(name);
+      this.remove(name);
       return;
     }
 
     // Otherwise, returns the room without that user
-    this.saveRoom(room);
+    this.save(room);
     return room;
-  }
-
-  getRoom(name: string) {
-    const key = this.getRoomKey(name);
-    return RedisManager.getObject<Room>(key);
   }
 
   /** Returns true if username is unique in given room */
   async userNameIsUnique(roomName: string, candidateUserName: string) {
-    const room = await this.getRoom(roomName);
+    const room = await this.get(roomName);
     if (!room) return true;
 
     const usersList = Object.values(room.users);
     return !usersList.some((u) => u.name === candidateUserName);
+  }
+
+  get(name: string) {
+    const key = this.getKey(name);
+    return RedisManager.getObject<Room>(key);
   }
 
   private createRoom(name: string, host: User) {
@@ -64,18 +66,20 @@ class RoomManager {
     return room;
   }
 
-  private saveRoom(room: Room) {
-    const key = this.getRoomKey(room.name);
+  save(room: Room) {
+    const key = this.getKey(room.name);
     RedisManager.set(key, room);
   }
 
-  private removeRoom(name: string) {
-    const key = this.getRoomKey(name);
+  remove(name: string) {
+    const key = this.getKey(name);
     RedisManager.remove(key);
   }
 
-  private getRoomKey(name: string) {
-    return RedisManager.formatKey('room', name);
+  getKey(name: string) {
+    // Example kebabCase: '__FOO_BAR__' => 'foo-bar' ; 'Foo Bar' => 'foo-bar'
+    const formattedName = kebabCase(name);
+    return RedisManager.formatKey('room', formattedName);
   }
 }
 

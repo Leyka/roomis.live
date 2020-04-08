@@ -1,5 +1,4 @@
 import * as Redis from 'ioredis';
-import { kebabCase } from 'lodash';
 
 // Single instance of Redis
 export const redis = new Redis();
@@ -10,11 +9,9 @@ export module RedisManager {
   }
 
   /** Format key name to turns into "type:key" format
-   * Example {type: 'room', key: 'my__music'} will returns 'room:my-music' */
+   * Example {type: 'room', key: 'music'} will returns 'room:music' */
   export function formatKey(type: string, key: string) {
-    // Example kebabCase: '__FOO_BAR__' => 'foo-bar' ; 'Foo Bar' => 'foo-bar'
-    const formattedKey = kebabCase(key);
-    return `${type}:${formattedKey}`;
+    return `${type}:${key}`;
   }
 
   /** Fetch redis database and returns object in JSON */

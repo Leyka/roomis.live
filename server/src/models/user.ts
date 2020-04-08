@@ -1,53 +1,39 @@
-import { User, Users } from '../../../shared/types';
+import { User } from '../../../shared/types';
 import { generateAnimalName } from '../utils/generator';
 import { RedisManager } from '../utils/redis';
 import { roomManager } from './room';
+import { Manager } from './types';
 
-const USERS_KEY = 'users';
-
-class UserManager {
+class UserManager implements Manager<User> {
   async createUser(id: string, roomName: string, ip: string, userName?: string) {
     const user: User = {
       id,
       ip,
-      name: userName ?? this.generateUniqueName(roomName),
       room: roomName,
+      name: userName ?? this.generateUniqueName(roomName),
     };
 
-    await this.saveUser(user);
+    await this.save(user);
     return user;
   }
 
-  async getAllUsers() {
-    const users = await RedisManager.getObject<Users>(USERS_KEY);
-    return users ?? {};
+  get(id: string) {
+    const key = this.getKey(id);
+    return RedisManager.getObject<User>(key);
   }
 
-  async getUser(id: string) {
-    const users = await this.getAllUsers();
-    return users[id];
+  save(user: User) {
+    const key = this.getKey(user.id);
+    RedisManager.set(key, user);
   }
 
-  async saveUser(user: User) {
-    let users = await this.getAllUsers();
-    users[user.id] = user;
-    RedisManager.set(USERS_KEY, users);
+  remove(id: string) {
+    const key = this.getKey(id);
+    RedisManager.remove(key);
   }
 
-  async removeUser(userId: string) {
-    let users = await this.getAllUsers();
-    if (!users) return;
-
-    delete users[userId];
-
-    const usersIsEmpty = Object.keys(users).length === 0;
-    if (usersIsEmpty) {
-      // Delete users key
-      RedisManager.remove(USERS_KEY);
-    } else {
-      // Update users key
-      RedisManager.set(USERS_KEY, users);
-    }
+  getKey(id: string) {
+    return RedisManager.formatKey('user', id);
   }
 
   private generateUniqueName(roomName: string) {
