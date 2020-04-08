@@ -4,7 +4,7 @@ import { Server } from 'http';
 import * as morgan from 'morgan';
 import * as socketio from 'socket.io';
 import { PORT } from './config';
-import { handleSocketEvents } from './sockets/handler';
+import { dispatchEvents } from './controllers/dispatcher';
 import { LoggerStream } from './utils/logger';
 import { RedisManager } from './utils/redis';
 
@@ -17,12 +17,13 @@ app.use(express.urlencoded({ extended: false }));
 
 // Sockets with socket.io
 const io = socketio(server);
-io.on('connection', handleSocketEvents);
+io.on('connection', dispatchEvents);
 
 // Start redis
 if (RedisManager.isStarted) {
   console.log('Redis is listening on port 6379');
 }
+
 // Logging
 app.use(morgan('combined', { stream: new LoggerStream() }));
 
