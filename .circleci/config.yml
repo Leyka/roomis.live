@@ -1,0 +1,28 @@
+version: 2.1
+orbs:
+  node: circleci/node@1.1.6
+jobs:
+  build-server:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - run: |
+          cd server
+          yarn
+          npm run build
+          npm test
+  build-client:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - run: |
+          cd client
+          yarn
+          npm run build
+workflows:
+  build:
+    jobs:
+      - build-server
+      - build-client
