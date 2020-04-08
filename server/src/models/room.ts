@@ -20,9 +20,8 @@ class RoomManager {
   async leave(name: string, userId: string) {
     let room = await this.getRoom(name);
     if (!room) return;
-    delete room.users[userId];
 
-    console.log('room.users', room.users);
+    delete room.users[userId];
 
     const roomIsEmpty = Object.keys(room.users).length === 0;
     if (roomIsEmpty) {
@@ -39,6 +38,15 @@ class RoomManager {
   getRoom(name: string) {
     const key = this.getRoomKey(name);
     return RedisManager.getObject<Room>(key);
+  }
+
+  /** Returns true if username is unique in given room */
+  async userNameIsUnique(roomName: string, candidateUserName: string) {
+    const room = await this.getRoom(roomName);
+    if (!room) return true;
+
+    const usersList = Object.values(room.users);
+    return !usersList.some((u) => u.name === candidateUserName);
   }
 
   private createRoom(name: string, host: User) {

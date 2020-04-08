@@ -19,7 +19,9 @@ export interface Video {
 
 export interface User {
   id: string;
+  ip?: string;
   name: string;
+  room: string;
 }
 
 export type PlaylistQueue = {

@@ -1,6 +1,7 @@
 import { SERVER_URL } from '@/config';
 import { useRootStore } from '@/store';
 import { RoomEvent } from '@shared/events';
+import { kebabCase } from 'lodash';
 import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
@@ -11,7 +12,7 @@ export const Room: FC = () => {
   const { roomStore } = useRootStore();
   // Returns name of the room that users entered in URL bar
   const { name } = useParams();
-  roomStore.name = escape(name!);
+  roomStore.name = kebabCase(name);
 
   const [socket, setSocket] = useState<SocketIOClient.Socket>();
 
