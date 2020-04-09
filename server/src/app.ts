@@ -4,7 +4,7 @@ import { Server } from 'http';
 import * as morgan from 'morgan';
 import * as socketio from 'socket.io';
 import { PORT } from './config';
-import { dispatchEvents } from './controllers/dispatcher';
+import { dispatchEvents } from './router';
 import { LoggerStream } from './utils/logger';
 
 const app = express();

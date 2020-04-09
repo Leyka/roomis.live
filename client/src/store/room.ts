@@ -7,5 +7,5 @@ export class RoomStore {
     this.rootStore = rootStore;
   }
 
-  @observable name: string = '';
+  @observable roomName: string = '';
 }

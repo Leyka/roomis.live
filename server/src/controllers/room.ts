@@ -3,20 +3,30 @@ import { roomManager } from '../models/room';
 import { userManager } from '../models/user';
 import { logger } from '../utils/logger';
 
-export async function onRoomJoin(socket: Socket, roomName: string, userName?: string) {
-  const ip = socket.handshake.address;
-  const user = await userManager.createUser(socket.id, roomName, ip, userName);
-  roomManager.join(roomName, user);
+export module RoomController {
+  export async function onRoomJoin(socket: Socket, roomName: string, userName?: string) {
+    const ip = socket.handshake.address;
+    const user = userManager.createUser(socket.id, roomName, ip, userName);
+    // Update DB
+    await roomManager.join(roomName, user);
 
-  logger.info(`User ${JSON.stringify(user)} joined room ${roomName}`);
-}
+    // Update socket
+    socket.join(roomName);
 
-export async function onRoomDisconnect(socket: Socket) {
-  const user = await userManager.get(socket.id);
-  if (user) {
-    await roomManager.leave(user.room, user.id);
-    await userManager.remove(user.id);
+    logger.info(`User ${JSON.stringify(user)} joined room ${roomName}`);
+  }
 
-    logger.info(`User ${JSON.stringify(user)} joined room ${user.room}`);
+  export async function onRoomDisconnect(socket: Socket) {
+    const user = await userManager.get(socket.id);
+    if (user) {
+      // Update DB
+      await roomManager.leave(user.room, user.id);
+      await userManager.remove(user.id);
+
+      // Update socket
+      socket.leave(user.room);
+
+      logger.info(`User ${JSON.stringify(user)} joined room ${user.room}`);
+    }
   }
 }

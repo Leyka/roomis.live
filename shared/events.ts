@@ -5,9 +5,10 @@ export enum RoomEvent {
 
 export enum PlayerEvent {
   Ready = 'ready-player',
-  Start = 'start-player',
+  Init = 'init-player',
   Play = 'play-player',
   Pause = 'pause-player',
+  Progress = 'progress-player',
 }
 
 export enum LogEvent {

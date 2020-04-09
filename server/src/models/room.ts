@@ -1,26 +1,33 @@
 import { kebabCase } from 'lodash';
 import { Room, User } from '../../../shared/types';
 import { RedisManager } from '../utils/redis';
-import { Manager } from './types';
+import { Manager } from './manager';
+import { playerManager } from './player';
+import { userManager } from './user';
 
-class RoomManager implements Manager<Room> {
+class RoomManager extends Manager<Room> {
   /** Create or update room when user joins */
-  async join(name: string, user: User) {
-    let room = await this.get(name);
+  async join(roomName: string, user: User) {
+    let room = await this.get(roomName);
     if (room) {
       // Existing room, add new user
       room.users[user.id] = user;
     } else {
       // New room
-      room = this.createRoom(name, user);
+      room = this.createRoom(roomName, user);
+      playerManager.createPlayer(roomName);
+
+      // Make user host
+      user.isHost = true;
+      await userManager.save(user);
     }
 
     this.save(room);
     return room;
   }
 
-  async leave(name: string, userId: string) {
-    let room = await this.get(name);
+  async leave(roomName: string, userId: string) {
+    let room = await this.get(roomName);
     if (!room) return;
 
     delete room.users[userId];
@@ -28,7 +35,9 @@ class RoomManager implements Manager<Room> {
     // It was last user? Then delete room
     const roomIsEmpty = Object.keys(room.users).length === 0;
     if (roomIsEmpty) {
-      this.remove(name);
+      this.remove(roomName);
+      // Also remove the player associated to the room
+      playerManager.remove(roomName);
       return;
     }
 
@@ -52,9 +61,13 @@ class RoomManager implements Manager<Room> {
     return !usersList.some((u) => u.name === candidateUserName);
   }
 
-  get(name: string) {
-    const key = this.getKey(name);
-    return RedisManager.getObject<Room>(key);
+  /** Returns true if user is the host of this room or the host enabled power for guests */
+  async userCanEdit(userId: string, roomName: string) {
+    const room = await this.get(roomName);
+    if (!room) return false;
+
+    const isHost = room.hostUserId === userId;
+    return isHost || room.guestsHasPower;
   }
 
   private createRoom(name: string, host: User) {
@@ -63,6 +76,7 @@ class RoomManager implements Manager<Room> {
     };
 
     const room: Room = {
+      id: name,
       name,
       users,
       hostUserId: host.id,
@@ -72,19 +86,9 @@ class RoomManager implements Manager<Room> {
     return room;
   }
 
-  save(room: Room) {
-    const key = this.getKey(room.name);
-    RedisManager.set(key, room);
-  }
-
-  remove(name: string) {
-    const key = this.getKey(name);
-    RedisManager.remove(key);
-  }
-
-  getKey(name: string) {
+  getKey(id: string) {
     // Example kebabCase: '__FOO_BAR__' => 'foo-bar' ; 'Foo Bar' => 'foo-bar'
-    const formattedName = kebabCase(name);
+    const formattedName = kebabCase(id);
     return RedisManager.formatKey('room', formattedName);
   }
 }

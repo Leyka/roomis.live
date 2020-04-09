@@ -1,8 +1,9 @@
-export interface LivePlayer {
-  videoId: string;
+export interface Player {
+  id: string;
   isPlaying: boolean;
-  timeProgressSec: number;
-  lastTimeCheck: Date;
+  playedSeconds: number;
+  videoUrl?: string;
+  lastTimeCheck?: Date;
 }
 
 export enum Source {
@@ -21,6 +22,7 @@ export interface User {
   id: string;
   name: string;
   room: string;
+  isHost: boolean;
   ip?: string;
 }
 
@@ -33,6 +35,7 @@ export type Users = {
 };
 
 export interface Room {
+  id: string;
   name: string;
   users: Users;
   hostUserId: string;
