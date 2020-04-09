@@ -23,6 +23,7 @@ export interface User {
   name: string;
   room: string;
   isHost: boolean;
+  canEdit: boolean;
   ip?: string;
 }
 
@@ -39,7 +40,6 @@ export interface Room {
   name: string;
   users: Users;
   hostUserId: string;
-  guestsHasPower: boolean;
   queue?: PlaylistQueue;
   currentPlayingId?: string;
 }

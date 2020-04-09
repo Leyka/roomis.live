@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { PlayerEvent } from '../../../shared/events';
-import { roomManager } from '../models/room';
 import { playerManager } from './../models/player';
+import { userManager } from './../models/user';
 
 export module PlayerController {
   export async function onPlayerReady(socket: Socket, roomName: string) {
@@ -10,7 +10,7 @@ export module PlayerController {
   }
 
   export async function onPlayerPlay(socket: Socket, roomName: string) {
-    const canEdit = await userCanEdit(socket.id, roomName);
+    const canEdit = await userManager.canEdit(socket.id);
     if (!canEdit) return;
 
     // Send message to other users in the same room that we asked to Play
@@ -23,7 +23,7 @@ export module PlayerController {
   }
 
   export async function onPlayerPause(socket: Socket, roomName: string) {
-    const canEdit = await userCanEdit(socket.id, roomName);
+    const canEdit = await userManager.canEdit(socket.id);
     if (!canEdit) return;
 
     // Send message to other users in the same room that we asked to Pause
@@ -36,15 +36,11 @@ export module PlayerController {
   }
 
   export async function onPlayerProgress(socket: Socket, roomName: string, playedSeconds: number) {
-    const canEdit = await userCanEdit(socket.id, roomName);
-    if (!canEdit) return;
+    const isHost = await userManager.isHost(socket.id);
+    if (!isHost) return;
 
     let player = await playerManager.get(roomName);
     player.playedSeconds = playedSeconds;
     playerManager.save(player);
-  }
-
-  function userCanEdit(userId: string, roomName: string) {
-    return roomManager.userCanEdit(userId, roomName);
   }
 }

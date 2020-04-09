@@ -7,6 +7,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import ioClient from 'socket.io-client';
 import { LivePlayer } from '../LivePlayer/LivePlayer';
+import { Logger } from '../Logger/Logger';
 import { RoomLayout } from './RoomLayout';
 
 export const Room: FC = () => {
@@ -23,6 +24,7 @@ export const Room: FC = () => {
       setSocket(socket);
       // Notify server that a user joined a room
       socket.emit(RoomEvent.UserJoin, { roomName: roomStore.roomName });
+      socket.on(RoomEvent.UserUpdate, (u) => console.log('rdy', u));
     };
 
     initSocket();
@@ -37,8 +39,8 @@ export const Room: FC = () => {
       <RoomLayout
         header={<div>Room: {roomStore.roomName}</div>}
         playlist={<div>Playlist</div>}
-        player={<LivePlayer socket={socket} />}
-        logger={<div>Logger</div>}
+        player={<LivePlayer socket={socket} roomName={roomStore.roomName} userCanEdit userIsHost />}
+        logger={<Logger socket={socket} />}
         chat={<div>Chat</div>}
       />
     );

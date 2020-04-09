@@ -16,9 +16,9 @@ class RoomManager extends Manager<Room> {
       // New room
       room = this.createRoom(roomName, user);
       playerManager.createPlayer(roomName);
-
-      // Make user host
+      // Save user as host
       user.isHost = true;
+      user.canEdit = true;
       await userManager.save(user);
     }
 
@@ -38,14 +38,18 @@ class RoomManager extends Manager<Room> {
       this.remove(roomName);
       // Also remove the player associated to the room
       playerManager.remove(roomName);
-      return;
+      return undefined;
     }
 
     // We still have users in this room at this point
     // Check if it's the host who left. If so, transfer host rights to next user
     if (userId === room.hostUserId) {
-      const nextUserId = Object.keys(room.users)[0];
-      room.hostUserId = nextUserId;
+      const nextUser = Object.values(room.users)[0];
+      room.hostUserId = nextUser.id;
+      nextUser.isHost = true;
+      nextUser.canEdit = true;
+      room.users[nextUser.id] = nextUser;
+      await userManager.save(nextUser);
     }
 
     this.save(room);
@@ -53,7 +57,7 @@ class RoomManager extends Manager<Room> {
   }
 
   /** Returns true if username is unique in given room */
-  async userNameIsUnique(roomName: string, candidateUserName: string) {
+  async userNameUniqueInRoom(roomName: string, candidateUserName: string) {
     const room = await this.get(roomName);
     if (!room) return true;
 
@@ -61,13 +65,21 @@ class RoomManager extends Manager<Room> {
     return !usersList.some((u) => u.name === candidateUserName);
   }
 
-  /** Returns true if user is the host of this room or the host enabled power for guests */
-  async userCanEdit(userId: string, roomName: string) {
+  // TODO: Test this function
+  async setGuestsCanEdit(roomName: string, canEdit: boolean) {
     const room = await this.get(roomName);
-    if (!room) return false;
+    if (!room) return;
 
-    const isHost = room.hostUserId === userId;
-    return isHost || room.guestsHasPower;
+    await Promise.all(
+      Object.values(room.users).map(async (user) => {
+        if (!user.isHost) {
+          const savedUser = await userManager.setEdit(user.id, canEdit);
+          room.users[savedUser.id] = savedUser;
+        }
+      })
+    );
+
+    this.save(room);
   }
 
   private createRoom(name: string, host: User) {
@@ -80,7 +92,6 @@ class RoomManager extends Manager<Room> {
       name,
       users,
       hostUserId: host.id,
-      guestsHasPower: false,
     };
 
     return room;

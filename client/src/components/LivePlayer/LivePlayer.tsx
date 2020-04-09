@@ -1,18 +1,17 @@
-import { useRootStore } from '@/store';
 import { PlayerEvent } from '@shared/events';
 import { Player } from '@shared/types';
-import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
 interface Props {
   socket: SocketIOClient.Socket;
+  roomName: string;
+  userCanEdit: boolean;
+  userIsHost: boolean;
 }
 
 export const LivePlayer: FC<Props> = (props) => {
-  const { roomStore } = useRootStore();
-  const { roomName } = roomStore;
-  const { socket } = props;
+  const { roomName, socket, userCanEdit, userIsHost } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
@@ -42,31 +41,29 @@ export const LivePlayer: FC<Props> = (props) => {
   };
 
   const onPlay = () => {
-    socket.emit(PlayerEvent.Play, { roomName });
+    userCanEdit && socket.emit(PlayerEvent.Play, { roomName });
   };
 
   const onPause = () => {
-    socket.emit(PlayerEvent.Pause, { roomName });
+    userCanEdit && socket.emit(PlayerEvent.Pause, { roomName });
   };
 
   const onProgress = ({ playedSeconds }) => {
-    socket.emit(PlayerEvent.Progress, { roomName, playedSeconds }); // TODO: Only host can send his progress time to server
+    userIsHost && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds }); // TODO: Only host can send his progress time to server
   };
 
-  return useObserver(() => {
-    return (
-      <ReactPlayer
-        ref={playerRef}
-        url="https://www.youtube.com/watch?v=yZwmsfyjGuM&t=1s" // TODO: Retrieve from playlist
-        width="100%"
-        height="100%"
-        controls
-        playing={playing}
-        onReady={onReady}
-        onPlay={onPlay}
-        onPause={onPause}
-        onProgress={onProgress}
-      />
-    );
-  });
+  return (
+    <ReactPlayer
+      ref={playerRef}
+      url="https://www.youtube.com/watch?v=yZwmsfyjGuM&t=1s" // TODO: Retrieve from playlist
+      width="100%"
+      height="100%"
+      controls
+      playing={playing}
+      onReady={onReady}
+      onPlay={onPlay}
+      onPause={onPause}
+      onProgress={onProgress}
+    />
+  );
 };

@@ -9,4 +9,5 @@ export class UserStore {
 
   @observable userName: string = '';
   @observable isHost: boolean = false;
+  @observable canEdit: boolean = false;
 }
