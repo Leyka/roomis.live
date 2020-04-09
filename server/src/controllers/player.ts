@@ -1,11 +1,11 @@
 import { Socket } from 'socket.io';
 import { PlayerEvent } from '../../../shared/events';
 import { roomManager } from '../models/room';
-import { playerManager } from './../models/player';
+import { playerModel } from './../models/player';
 
 export module PlayerController {
   export async function onPlayerReady(socket: Socket, roomName: string) {
-    const player = await playerManager.get(roomName);
+    const player = await playerModel.get(roomName);
     socket.emit(PlayerEvent.Init, player);
   }
 
@@ -14,12 +14,12 @@ export module PlayerController {
     if (!canEdit) return;
 
     // Send message to other users in the same room that we asked to Play
-    let player = await playerManager.get(roomName);
+    let player = await playerModel.get(roomName);
     socket.broadcast.to(roomName).emit(PlayerEvent.Play, { playedSeconds: player.playedSeconds });
 
     // Update player in DB
     player.isPlaying = true;
-    playerManager.save(player);
+    playerModel.save(player);
   }
 
   export async function onPlayerPause(socket: Socket, roomName: string) {
@@ -30,17 +30,17 @@ export module PlayerController {
     socket.broadcast.to(roomName).emit(PlayerEvent.Pause);
 
     // Update player in DB
-    let player = await playerManager.get(roomName);
+    let player = await playerModel.get(roomName);
     player.isPlaying = false;
-    playerManager.save(player);
+    playerModel.save(player);
   }
 
   export async function onPlayerProgress(socket: Socket, roomName: string, playedSeconds: number) {
     const isHost = await roomManager.userIsHost(socket.id, roomName);
     if (!isHost) return;
 
-    let player = await playerManager.get(roomName);
+    let player = await playerModel.get(roomName);
     player.playedSeconds = playedSeconds;
-    playerManager.save(player);
+    playerModel.save(player);
   }
 }

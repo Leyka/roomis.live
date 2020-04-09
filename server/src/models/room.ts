@@ -2,10 +2,10 @@ import { kebabCase } from 'lodash';
 import { Room, User } from '../../../shared/types';
 import { generateAnimalName } from '../utils/generator';
 import { RedisManager } from '../utils/redis';
-import { Manager } from './manager';
-import { playerManager } from './player';
+import { Model } from './base-model';
+import { playerModel } from './player';
 
-class RoomManager extends Manager<Room> {
+class RoomModel extends Model<Room> {
   /** Create or update room when user joins */
   async join(roomName: string, userId: string, userIp: string, userName?: string) {
     let user = await this.createUser(userId, userIp, roomName, userName);
@@ -16,7 +16,7 @@ class RoomManager extends Manager<Room> {
     } else {
       // New room
       room = this.createRoom(roomName, user);
-      playerManager.createPlayer(roomName);
+      playerModel.createPlayer(roomName);
       // Save user as host
       user.isHost = true;
       user.canEdit = true;
@@ -37,7 +37,7 @@ class RoomManager extends Manager<Room> {
     if (roomIsEmpty) {
       this.remove(roomName);
       // Also remove the player associated to the room
-      playerManager.remove(roomName);
+      playerModel.remove(roomName);
       return undefined;
     }
 
@@ -161,4 +161,4 @@ class RoomManager extends Manager<Room> {
   }
 }
 
-export const roomManager = new RoomManager();
+export const roomManager = new RoomModel();

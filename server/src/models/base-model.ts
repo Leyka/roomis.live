@@ -4,7 +4,7 @@ type WithId = {
   id: string;
 };
 
-export abstract class Manager<T extends WithId> {
+export abstract class Model<T extends WithId> {
   get(id: string) {
     const key = this.getKey(id);
     return RedisManager.getObject<T>(key);

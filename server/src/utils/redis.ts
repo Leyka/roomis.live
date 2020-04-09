@@ -1,13 +1,36 @@
 import * as Redis from 'ioredis';
 
-// Single instance of Redis
-export const redis = new Redis();
-
 export module RedisManager {
+  // Single instance of Redis
+  export const redis = new Redis();
+
   /** Format key name to turns into "type:key" format
    * Example {type: 'room', key: 'music'} will returns 'room:music' */
   export function formatKey(type: string, key: string) {
     return `${type}:${key}`;
+  }
+
+  export function scan(pattern: string) {
+    const stream = redis.scanStream({
+      match: pattern,
+      count: 100,
+    });
+
+    return stream;
+
+    stream.on('data', function (resultKeys) {
+      // `resultKeys` is an array of strings representing key names.
+      // Note that resultKeys may contain 0 keys, and that it will sometimes
+      // contain duplicates due to SCAN's implementation in Redis.
+      for (var i = 0; i < resultKeys.length; i++) {
+        console.log(resultKeys[i]);
+      }
+
+      stream.emit('Done');
+    });
+    stream.on('end', function () {
+      console.log('all keys have been visited');
+    });
   }
 
   /** Fetch redis database and returns object in JSON */
@@ -19,8 +42,7 @@ export module RedisManager {
 
   export async function getObjectsAsArray<T>(keyPattern: string) {
     const keys = await redis.keys(keyPattern);
-    const values = keys.map((key) => getObject<T>(key));
-    return Promise.all(values);
+    return Promise.all(keys.map((key) => getObject<T>(key)));
   }
 
   /** Save object as string format in redis database */
