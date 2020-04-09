@@ -1,15 +1,14 @@
 import { Socket } from 'socket.io';
 import { LogEvent, RoomEvent } from '../../../shared/events';
 import { roomManager } from '../models/room';
-import { userManager } from '../models/user';
 import { logger } from '../utils/logger';
 
 export module RoomController {
   export async function onRoomJoin(socket: Socket, roomName: string, userName?: string) {
-    const ip = socket.handshake.address;
-    const user = await userManager.createUser(socket.id, roomName, ip, userName);
     // Update DB
-    await roomManager.join(roomName, user);
+    const ip = socket.handshake.address;
+    await roomManager.join(roomName, socket.id, ip, userName);
+    const user = await roomManager.getUser(socket.id, roomName);
 
     // Update socket
     socket.join(roomName);
@@ -21,13 +20,11 @@ export module RoomController {
   }
 
   export async function onRoomDisconnect(socket: Socket) {
-    const leavingUser = await userManager.get(socket.id);
+    const leavingUser = await roomManager.findUser(socket.id);
 
     if (leavingUser) {
       // Update DB
       const room = await roomManager.leave(leavingUser.room, leavingUser.id);
-      await userManager.remove(leavingUser.id);
-
       if (!room) {
         logger.info(`${leavingUser.room} is now empty.`);
         return;
@@ -42,7 +39,7 @@ export module RoomController {
       // Check if the host left room, if so keep updated the new user
       // and let everyone else know who is the new host
       if (leavingUser.isHost) {
-        const newHost = await userManager.get(room.hostUserId);
+        const newHost = await roomManager.getUser(room.hostUserId, room.name);
 
         socket.to(newHost.id).emit(RoomEvent.UserUpdate, newHost);
         socket.broadcast

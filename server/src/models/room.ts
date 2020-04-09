@@ -1,13 +1,14 @@
 import { kebabCase } from 'lodash';
 import { Room, User } from '../../../shared/types';
+import { generateAnimalName } from '../utils/generator';
 import { RedisManager } from '../utils/redis';
 import { Manager } from './manager';
 import { playerManager } from './player';
-import { userManager } from './user';
 
 class RoomManager extends Manager<Room> {
   /** Create or update room when user joins */
-  async join(roomName: string, user: User) {
+  async join(roomName: string, userId: string, userIp: string, userName?: string) {
+    let user = await this.createUser(userId, userIp, roomName, userName);
     let room = await this.get(roomName);
     if (room) {
       // Existing room, add new user
@@ -19,7 +20,6 @@ class RoomManager extends Manager<Room> {
       // Save user as host
       user.isHost = true;
       user.canEdit = true;
-      await userManager.save(user);
     }
 
     this.save(room);
@@ -49,23 +49,12 @@ class RoomManager extends Manager<Room> {
       nextUser.isHost = true;
       nextUser.canEdit = true;
       room.users[nextUser.id] = nextUser;
-      await userManager.save(nextUser);
     }
 
     this.save(room);
     return room;
   }
 
-  /** Returns true if username is unique in given room */
-  async userNameUniqueInRoom(roomName: string, candidateUserName: string) {
-    const room = await this.get(roomName);
-    if (!room) return true;
-
-    const usersList = Object.values(room.users);
-    return !usersList.some((u) => u.name === candidateUserName);
-  }
-
-  // TODO: Test this function
   async setGuestsCanEdit(roomName: string, canEdit: boolean) {
     const room = await this.get(roomName);
     if (!room) return;
@@ -73,13 +62,28 @@ class RoomManager extends Manager<Room> {
     await Promise.all(
       Object.values(room.users).map(async (user) => {
         if (!user.isHost) {
-          const savedUser = await userManager.setEdit(user.id, canEdit);
-          room.users[savedUser.id] = savedUser;
+          room.users[user.id] = {
+            ...user,
+            canEdit,
+          };
         }
       })
     );
 
     this.save(room);
+  }
+
+  private async createUser(id: string, ip: string, room: string, userName: string) {
+    const user: User = {
+      id,
+      ip,
+      room,
+      isHost: false,
+      canEdit: false,
+      name: userName ?? (await this.generateUniqueName(room)),
+    };
+
+    return user;
   }
 
   private createRoom(name: string, host: User) {
@@ -95,6 +99,59 @@ class RoomManager extends Manager<Room> {
     };
 
     return room;
+  }
+
+  get allRooms() {
+    return RedisManager.getObjectsAsArray<Room>('room:*');
+  }
+
+  async allUsers() {
+    const allRooms = await this.allRooms;
+    const allUsers = allRooms.flatMap<User>((room) => Object.values(room.users));
+    return allUsers;
+  }
+
+  async findUser(userId: string) {
+    const allUsers = await this.allUsers();
+    return allUsers.find((user) => user.id === userId);
+  }
+
+  async getUser(userId: string, roomName: string) {
+    const room = await this.get(roomName);
+    return room.users[userId];
+  }
+
+  async userCanEdit(userId: string, roomName: string) {
+    const room = await this.get(roomName);
+    if (!room) return false;
+    const user = room.users[userId];
+    return user && user.canEdit;
+  }
+
+  async userIsHost(userId: string, roomName: string) {
+    const room = await this.get(roomName);
+    if (!room) return false;
+    return room.hostUserId === userId;
+  }
+
+  /** Returns true if username is unique in given room */
+  private async userNameUniqueInRoom(roomName: string, candidateUserName: string) {
+    const room = await this.get(roomName);
+    if (!room) return true;
+
+    const usersList = Object.values(room.users);
+    return !usersList.some((u) => u.name === candidateUserName);
+  }
+
+  private async generateUniqueName(roomName: string) {
+    let candidateName = generateAnimalName();
+    let isUnique = await this.userNameUniqueInRoom(roomName, candidateName);
+    while (!isUnique) {
+      candidateName = generateAnimalName();
+      isUnique = await this.userNameUniqueInRoom(roomName, candidateName);
+    }
+
+    return candidateName;
   }
 
   getKey(id: string) {

@@ -17,6 +17,12 @@ export module RedisManager {
     return JSON.parse(strValue);
   }
 
+  export async function getObjectsAsArray<T>(keyPattern: string) {
+    const keys = await redis.keys(keyPattern);
+    const values = keys.map((key) => getObject<T>(key));
+    return Promise.all(values);
+  }
+
   /** Save object as string format in redis database */
   export function set(key: string, value: any) {
     const strValue = typeof value === 'object' ? JSON.stringify(value) : value;
