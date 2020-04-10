@@ -1,10 +1,7 @@
 import { kebabCase } from 'lodash';
-import { BaseModel } from '.';
-import { Room } from '../../../shared/types';
+import { BaseModel, playerModel, userModel } from '.';
+import { Room, User } from '../../../shared/types';
 import { RedisManager } from '../utils/redis-manager';
-import { User } from './../../../shared/types';
-import { playerModel } from './player';
-import { userModel } from './user';
 
 class RoomModel extends BaseModel<Room> {
   /** Create or update room when user joins */
@@ -46,8 +43,13 @@ class RoomModel extends BaseModel<Room> {
 
     // Transfer host to next user if it's host leaving
     if (userId === room.hostId) {
-      const nextUserId = Object.values(room.userIds)[0];
-      room.hostId = nextUserId;
+      const newHostId = Object.values(room.userIds)[0];
+      room.hostId = newHostId;
+
+      // Update user
+      let newHost = await userModel.get(newHostId);
+      newHost.isHost = true;
+      userModel.save(newHost);
     }
 
     this.save(room);

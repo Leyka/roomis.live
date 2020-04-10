@@ -1,7 +1,6 @@
 import { Socket } from 'socket.io';
 import { PlayerEvent } from '../../../shared/events';
-import { playerModel } from './../models/player';
-import { userModel } from './../models/user';
+import { playerModel, userModel } from '../models';
 
 export module PlayerController {
   export async function onPlayerReady(socket: Socket, roomName: string) {

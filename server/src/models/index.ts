@@ -23,3 +23,7 @@ export abstract class BaseModel<T extends WithId> {
   /** Get formatted Key in redis. Ex: if we getting a key of type 'user', it returns 'user:{key}' */
   abstract getKey(id: string): string;
 }
+
+export * from './room.model';
+export * from './user.model';
+export * from './player.model';
