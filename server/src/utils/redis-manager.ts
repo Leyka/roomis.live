@@ -47,11 +47,4 @@ export module RedisManager {
   export function remove(key: string) {
     redis.del(key);
   }
-
-  /** Execute multiple remove functions foreach key that matches pattern */
-  export async function removeByKeyPattern(keyPattern: string) {
-    const keys = await redis.keys(keyPattern);
-    redis.mget(...['sss', 'ss']);
-    keys.forEach(remove);
-  }
 }
