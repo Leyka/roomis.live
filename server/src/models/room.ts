@@ -46,8 +46,13 @@ class RoomModel extends BaseModel<Room> {
 
     // Transfer host to next user if it's host leaving
     if (userId === room.hostId) {
-      const nextUserId = Object.values(room.userIds)[0];
-      room.hostId = nextUserId;
+      const newHostId = Object.values(room.userIds)[0];
+      room.hostId = newHostId;
+
+      // Update user
+      let newHost = await userModel.get(newHostId);
+      newHost.isHost = true;
+      userModel.save(newHost);
     }
 
     this.save(room);

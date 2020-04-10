@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
 import { LogEvent, RoomEvent } from '../../../shared/events';
 import { roomModel } from '../models/room';
+import { userModel } from '../models/user';
 import { logger } from '../utils/logger';
-import { userModel } from './../models/user';
 
 export module RoomController {
   export async function onRoomJoin(socket: Socket, roomName: string, userName?: string) {
@@ -39,8 +39,8 @@ export module RoomController {
     // Check if the host left room, if so keep updated the new user, and let everyone else know who is the new host
     if (leavingUser.isHost) {
       const newHost = await userModel.get(room.hostId);
+
       socket.to(newHost.id).emit(RoomEvent.UserUpdate, newHost);
-      socket.id = newHost.id;
       socket.broadcast.to(leavingUser.room).emit(LogEvent.Send, `${newHost.name} is now hosting.`);
       socket.to(newHost.id).emit(LogEvent.Send, 'You are now the host. Feeeeeel the powah!');
     }

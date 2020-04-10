@@ -11,7 +11,7 @@ import { Logger } from '../Logger/Logger';
 import { RoomLayout } from './RoomLayout';
 
 export const Room: FC = () => {
-  const { roomStore } = useRootStore();
+  const { roomStore, userStore } = useRootStore();
   // Returns name of the room that users entered in URL bar
   const { name } = useParams();
   roomStore.roomName = kebabCase(name);
@@ -24,11 +24,11 @@ export const Room: FC = () => {
       setSocket(socket);
       // Notify server that a user joined a room
       socket.emit(RoomEvent.UserJoin, { roomName: roomStore.roomName });
-      socket.on(RoomEvent.UserUpdate, (u) => console.log('rdy', u));
+      socket.on(RoomEvent.UserUpdate, (user) => userStore.set(user));
     };
 
     initSocket();
-  }, [roomStore.roomName]);
+  }, [roomStore.roomName, userStore]);
 
   return useObserver(() => {
     if (!socket) {
