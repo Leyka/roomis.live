@@ -1,164 +1,101 @@
 import { kebabCase } from 'lodash';
-import { Room, User } from '../../../shared/types';
-import { generateAnimalName } from '../utils/generator';
-import { RedisManager } from '../utils/redis';
-import { Manager } from './manager';
-import { playerManager } from './player';
+import { BaseModel } from '.';
+import { Room } from '../../../shared/types';
+import { RedisManager } from '../utils/redis-manager';
+import { User } from './../../../shared/types';
+import { playerModel } from './player';
+import { userModel } from './user';
 
-class RoomManager extends Manager<Room> {
+class RoomModel extends BaseModel<Room> {
   /** Create or update room when user joins */
-  async join(roomName: string, userId: string, userIp: string, userName?: string) {
-    let user = await this.createUser(userId, userIp, roomName, userName);
+  async join(roomName: string, userId: string) {
     let room = await this.get(roomName);
     if (room) {
-      // Existing room, add new user
-      room.users[user.id] = user;
+      // Exists
+      room.userIds = room.userIds.concat(userId);
     } else {
-      // New room
-      room = this.createRoom(roomName, user);
-      playerManager.createPlayer(roomName);
-      // Save user as host
-      user.isHost = true;
-      user.canEdit = true;
+      // New
+      room = this.createRoom(roomName, userId);
+      playerModel.createPlayer(roomName);
     }
 
     this.save(room);
     return room;
   }
 
+  /** Remove user from room */
   async leave(roomName: string, userId: string) {
     let room = await this.get(roomName);
     if (!room) return;
 
-    delete room.users[userId];
+    const userIndex = room.userIds.indexOf(userId);
+    if (userIndex < 0) {
+      // User not found
+      return;
+    }
 
-    // It was last user? Then delete room
-    const roomIsEmpty = Object.keys(room.users).length === 0;
-    if (roomIsEmpty) {
+    // Delete user
+    room.userIds.splice(userIndex, 1);
+
+    // Last user? Delete room
+    if (Object.keys(room.userIds).length === 0) {
       this.remove(roomName);
-      // Also remove the player associated to the room
-      playerManager.remove(roomName);
+      playerModel.remove(roomName);
       return undefined;
     }
 
-    // We still have users in this room at this point
-    // Check if it's the host who left. If so, transfer host rights to next user
-    if (userId === room.hostUserId) {
-      const nextUser = Object.values(room.users)[0];
-      room.hostUserId = nextUser.id;
-      nextUser.isHost = true;
-      nextUser.canEdit = true;
-      room.users[nextUser.id] = nextUser;
+    // Transfer host to next user if it's host leaving
+    if (userId === room.hostId) {
+      const nextUserId = Object.values(room.userIds)[0];
+      room.hostId = nextUserId;
     }
 
     this.save(room);
     return room;
   }
 
-  async setGuestsCanEdit(roomName: string, canEdit: boolean) {
-    const room = await this.get(roomName);
-    if (!room) return;
-
-    await Promise.all(
-      Object.values(room.users).map(async (user) => {
-        if (!user.isHost) {
-          room.users[user.id] = {
-            ...user,
-            canEdit,
-          };
-        }
-      })
-    );
-
-    this.save(room);
-  }
-
-  private async createUser(id: string, ip: string, room: string, userName: string) {
-    const user: User = {
-      id,
-      ip,
-      room,
-      isHost: false,
-      canEdit: false,
-      name: userName ?? (await this.generateUniqueName(room)),
-    };
-
-    return user;
-  }
-
-  private createRoom(name: string, host: User) {
-    const users = {
-      [host.id]: host,
-    };
-
+  private createRoom(roomName: string, hostId: string) {
+    const userIds = [hostId];
     const room: Room = {
-      id: name,
-      name,
-      users,
-      hostUserId: host.id,
+      id: roomName,
+      name: roomName,
+      userIds,
+      hostId,
+      guestsCanEdit: false,
     };
-
     return room;
   }
 
-  get allRooms() {
-    return RedisManager.getObjectsAsArray<Room>('room:*');
-  }
-
-  async allUsers() {
-    const allRooms = await this.allRooms;
-    const allUsers = allRooms.flatMap<User>((room) => Object.values(room.users));
-    return allUsers;
-  }
-
-  async findUser(userId: string) {
-    const allUsers = await this.allUsers();
-    return allUsers.find((user) => user.id === userId);
-  }
-
-  async getUser(userId: string, roomName: string) {
+  async getRoomUsers(roomName: string) {
     const room = await this.get(roomName);
-    return room.users[userId];
+    const keys = room.userIds.map((id) => userModel.getKey(id));
+    return RedisManager.getManyObjects<User>(keys);
   }
 
-  async userCanEdit(userId: string, roomName: string) {
+  async setGuestsRight(roomName: string, canEdit: boolean) {
+    // Update room
     const room = await this.get(roomName);
-    if (!room) return false;
-    const user = room.users[userId];
-    return user && user.canEdit;
-  }
+    room.guestsCanEdit = canEdit;
+    this.save(room);
 
-  async userIsHost(userId: string, roomName: string) {
-    const room = await this.get(roomName);
-    if (!room) return false;
-    return room.hostUserId === userId;
-  }
+    // Update users
+    let updatedUsersDict: { [id: string]: User } = {};
+    const users = await this.getRoomUsers(roomName);
+    users.forEach((user) => {
+      updatedUsersDict[user.id] = {
+        ...user,
+        canEdit,
+      };
+    });
 
-  /** Returns true if username is unique in given room */
-  private async userNameUniqueInRoom(roomName: string, candidateUserName: string) {
-    const room = await this.get(roomName);
-    if (!room) return true;
-
-    const usersList = Object.values(room.users);
-    return !usersList.some((u) => u.name === candidateUserName);
-  }
-
-  private async generateUniqueName(roomName: string) {
-    let candidateName = generateAnimalName();
-    let isUnique = await this.userNameUniqueInRoom(roomName, candidateName);
-    while (!isUnique) {
-      candidateName = generateAnimalName();
-      isUnique = await this.userNameUniqueInRoom(roomName, candidateName);
-    }
-
-    return candidateName;
+    RedisManager.setMany(updatedUsersDict);
   }
 
   getKey(id: string) {
-    // Example kebabCase: '__FOO_BAR__' => 'foo-bar' ; 'Foo Bar' => 'foo-bar'
+    // Example kebabCase: __FOO BAR__ => 'foo-bar'
     const formattedName = kebabCase(id);
     return RedisManager.formatKey('room', formattedName);
   }
 }
 
-export const roomManager = new RoomManager();
+export const roomModel = new RoomModel();

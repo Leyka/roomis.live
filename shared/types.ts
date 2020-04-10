@@ -20,26 +20,23 @@ export interface Video {
 
 export interface User {
   id: string;
+  ip: string;
   name: string;
   room: string;
   isHost: boolean;
   canEdit: boolean;
-  ip?: string;
 }
 
 export type PlaylistQueue = {
   [id: string]: Video;
 };
 
-export type Users = {
-  [id: string]: User;
-};
-
 export interface Room {
   id: string;
   name: string;
-  users: Users;
-  hostUserId: string;
+  hostId: string;
+  guestsCanEdit: boolean;
+  userIds: string[];
   queue?: PlaylistQueue;
   currentPlayingId?: string;
 }

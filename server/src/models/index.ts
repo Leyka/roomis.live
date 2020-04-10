@@ -1,10 +1,10 @@
-import { RedisManager } from '../utils/redis';
+import { RedisManager } from '../utils/redis-manager';
 
 type WithId = {
   id: string;
 };
 
-export abstract class Manager<T extends WithId> {
+export abstract class BaseModel<T extends WithId> {
   get(id: string) {
     const key = this.getKey(id);
     return RedisManager.getObject<T>(key);
@@ -12,7 +12,7 @@ export abstract class Manager<T extends WithId> {
 
   save(obj: T) {
     const key = this.getKey(obj.id);
-    RedisManager.set(key, obj);
+    return RedisManager.set(key, obj);
   }
 
   remove(id: string) {
