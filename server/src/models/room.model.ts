@@ -1,10 +1,7 @@
 import { kebabCase } from 'lodash';
-import { BaseModel } from '.';
-import { Room } from '../../../shared/types';
+import { BaseModel, playerModel, userModel } from '.';
+import { Room, User } from '../../../shared/types';
 import { RedisManager } from '../utils/redis-manager';
-import { User } from './../../../shared/types';
-import { playerModel } from './player';
-import { userModel } from './user';
 
 class RoomModel extends BaseModel<Room> {
   /** Create or update room when user joins */

@@ -1,7 +1,6 @@
 import { Socket } from 'socket.io';
 import { LogEvent, RoomEvent } from '../../../shared/events';
-import { roomModel } from '../models/room';
-import { userModel } from '../models/user';
+import { roomModel, userModel } from '../models';
 import { logger } from '../utils/logger';
 
 export module RoomController {

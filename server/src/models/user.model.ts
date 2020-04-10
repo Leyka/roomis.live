@@ -2,7 +2,7 @@ import { BaseModel } from '.';
 import { generateAnimalName } from '../utils/generator';
 import { RedisManager } from '../utils/redis-manager';
 import { Room, User } from './../../../shared/types';
-import { roomModel } from './room';
+import { roomModel } from './room.model';
 
 class UserModel extends BaseModel<User> {
   async createUser(id: string, ip: string, room: Room, userName?: string) {
@@ -19,24 +19,6 @@ class UserModel extends BaseModel<User> {
     this.save(user);
     return user;
   }
-
-  /*
-  async get(id: string) {
-    const user = await this.get(id);
-    const userRoom = await roomModel.get(user.room);
-
-    const isHost = user.id === userRoom.hostId;
-    const canEdit = isHost || userRoom.guestsCanEdit;
-
-    const userWithRights: User = {
-      ...user,
-      isHost,
-      canEdit,
-    };
-
-    return userWithRights;
-  }
-  */
 
   private async generateName(roomName: string) {
     let candidateName = generateAnimalName();

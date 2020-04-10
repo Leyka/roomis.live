@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { PlayerEvent, RoomEvent } from '../../shared/events';
-import { PlayerController } from './controllers/player';
-import { RoomController } from './controllers/room';
+import { PlayerController } from './controllers/player.controller';
+import { RoomController } from './controllers/room.controller';
 
 export function dispatchEvents(socket: Socket) {
   // --- Room ---
