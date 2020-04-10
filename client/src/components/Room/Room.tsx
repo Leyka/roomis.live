@@ -17,6 +17,7 @@ export const Room: FC = () => {
   roomStore.roomName = kebabCase(name);
 
   const [socket, setSocket] = useState<SocketIOClient.Socket>();
+  const [canEdit, setCanEdit] = useState(false);
 
   useEffect(() => {
     const initSocket = async () => {
@@ -30,6 +31,11 @@ export const Room: FC = () => {
     initSocket();
   }, [roomStore.roomName, userStore]);
 
+  const onGuestsCanEditClick = () => {
+    setCanEdit(!canEdit);
+    socket!.emit(RoomEvent.GuestsCanEdit, { canEdit: !canEdit });
+  };
+
   return useObserver(() => {
     if (!socket) {
       return <div>Loading...</div>;
@@ -37,7 +43,15 @@ export const Room: FC = () => {
 
     return (
       <RoomLayout
-        header={<div>Room: {roomStore.roomName}</div>}
+        header={
+          <div>
+            Room: {roomStore.roomName}
+            <div>
+              Test only: <button onClick={onGuestsCanEditClick}>Toggle guest right</button>
+            </div>
+            <div>Can Edit ? {userStore.canEdit ? 'Yes' : 'No'}</div>
+          </div>
+        }
         playlist={<div>Playlist</div>}
         player={<LivePlayer socket={socket} roomName={roomStore.roomName} userCanEdit userIsHost />}
         logger={<Logger socket={socket} />}

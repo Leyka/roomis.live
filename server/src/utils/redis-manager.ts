@@ -34,13 +34,13 @@ export module RedisManager {
 
   /** Save object as string format in redis database */
   export function setMany(dictKeyValue: { [k: string]: any }) {
+    const copyDict = { ...dictKeyValue };
     // Stringify values
     Object.keys(dictKeyValue).forEach((key) => {
       const value = dictKeyValue[key];
-      dictKeyValue[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+      copyDict[key] = typeof value === 'object' ? JSON.stringify(value) : value;
     });
-
-    redis.mset(dictKeyValue);
+    redis.mset(copyDict);
   }
 
   /** Remove key from database */

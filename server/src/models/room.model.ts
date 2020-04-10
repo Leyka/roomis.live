@@ -75,8 +75,10 @@ class RoomModel extends BaseModel<Room> {
   }
 
   async setGuestsRight(roomName: string, canEdit: boolean) {
-    // Update room
     const room = await this.get(roomName);
+    if (!room) return;
+
+    // Update room
     room.guestsCanEdit = canEdit;
     this.save(room);
 
@@ -84,6 +86,7 @@ class RoomModel extends BaseModel<Room> {
     let updatedUsersDict: { [id: string]: User } = {};
     const users = await this.getRoomUsers(roomName);
     users.forEach((user) => {
+      if (user.isHost) return;
       updatedUsersDict[user.id] = {
         ...user,
         canEdit,
@@ -91,6 +94,7 @@ class RoomModel extends BaseModel<Room> {
     });
 
     RedisManager.setMany(updatedUsersDict);
+    return updatedUsersDict;
   }
 
   getKey(id: string) {

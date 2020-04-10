@@ -7,6 +7,9 @@ export function dispatchEvents(socket: Socket) {
   // --- Room ---
   socket.on(RoomEvent.UserJoin, ({ roomName }) => RoomController.onRoomJoin(socket, roomName));
   socket.on(RoomEvent.UserDisconnect, () => RoomController.onRoomDisconnect(socket));
+  socket.on(RoomEvent.GuestsCanEdit, ({ canEdit }) =>
+    RoomController.onGuestsRightChange(socket, canEdit)
+  );
   // --- Player ---
   socket.on(PlayerEvent.Ready, ({ roomName }) => PlayerController.onPlayerReady(socket, roomName));
   socket.on(PlayerEvent.Play, ({ roomName }) => PlayerController.onPlayerPlay(socket, roomName));

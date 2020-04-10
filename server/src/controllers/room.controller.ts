@@ -46,4 +46,25 @@ export module RoomController {
 
     logger.info(`User ${JSON.stringify(leavingUser)} left room ${leavingUser.room}`);
   }
+
+  export async function onGuestsRightChange(socket: Socket, canEdit: boolean) {
+    console.log('Loading....');
+    const user = await userModel.get(socket.id);
+    if (!user || !user.isHost) return;
+
+    const usersDict = await roomModel.setGuestsRight(user.room, canEdit);
+    if (!usersDict) return;
+
+    const message = canEdit
+      ? 'Be free! Host granted this room editing access.'
+      : 'Host decided he is the only king in this room... He revoked the editing access.';
+
+    Object.values(usersDict).forEach((user) => {
+      // Send message to each user (except host) with updated user object
+      if (user.isHost) return;
+      socket.to(user.id).emit(RoomEvent.UserUpdate, user);
+      socket.broadcast.to(user.room).emit(LogEvent.Send, message);
+    });
+    console.log('Loading FINISHED.');
+  }
 }

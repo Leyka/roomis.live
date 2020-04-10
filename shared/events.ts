@@ -1,6 +1,7 @@
 export enum RoomEvent {
-  UserJoin = 'join',
-  UserUpdate = 'update',
+  UserJoin = 'room-join',
+  UserUpdate = 'room-update',
+  GuestsCanEdit = 'room-can-edit',
   UserDisconnect = 'disconnect',
 }
 
