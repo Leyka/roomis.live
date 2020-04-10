@@ -86,8 +86,9 @@ class RoomModel extends BaseModel<Room> {
     let updatedUsersDict: { [id: string]: User } = {};
     const users = await this.getRoomUsers(roomName);
     users.forEach((user) => {
-      if (user.isHost) return;
-      updatedUsersDict[user.id] = {
+      if (user.id === room.hostId) return;
+      const key = userModel.getKey(user.id);
+      updatedUsersDict[key] = {
         ...user,
         canEdit,
       };

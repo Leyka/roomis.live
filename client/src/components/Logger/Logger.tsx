@@ -1,17 +1,22 @@
+import { socket } from '@/utils/socket';
 import { LogEvent } from '@shared/events';
 import React, { FC, useEffect, useState } from 'react';
 
-interface Props {
-  socket: SocketIOClient.Socket;
-}
-
-export const Logger: FC<Props> = (props) => {
+export const Logger: FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
-  const { socket } = props;
 
   useEffect(() => {
-    socket.on(LogEvent.Send, (message) => setMessages([...messages, message]));
-  }, [socket, messages]);
+    socket.on(LogEvent.Send, (message) =>
+      setMessages((messages) => {
+        // Keep maximum 5 elements
+        if (messages.length > 4) {
+          messages.splice(messages.length - 1, 1);
+        }
+        messages.unshift(message);
+        return messages;
+      })
+    );
+  }, []);
 
   return (
     <div>

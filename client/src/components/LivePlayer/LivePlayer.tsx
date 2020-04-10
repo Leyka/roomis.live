@@ -1,17 +1,17 @@
+import { socket } from '@/utils/socket';
 import { PlayerEvent } from '@shared/events';
 import { Player } from '@shared/types';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
 interface Props {
-  socket: SocketIOClient.Socket;
   roomName: string;
   userCanEdit: boolean;
   userIsHost: boolean;
 }
 
 export const LivePlayer: FC<Props> = (props) => {
-  const { roomName, socket, userCanEdit, userIsHost } = props;
+  const { roomName, userCanEdit, userIsHost } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
@@ -34,7 +34,7 @@ export const LivePlayer: FC<Props> = (props) => {
     });
 
     socket.on(PlayerEvent.Pause, () => setPlaying(false));
-  }, [socket, playing]);
+  }, [playing]);
 
   const onReady = () => {
     socket.emit(PlayerEvent.Ready, { roomName });
