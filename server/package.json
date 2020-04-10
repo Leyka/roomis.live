@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "debug": "node --inspect=5858 -r ts-node/register ./src/app.ts",
-    "run": "node -r ts-node/register ./src/app.ts",
     "start": "nodemon",
     "build": "tsc",
     "test": "jest"
@@ -44,7 +43,7 @@
     "watch": [
       "src"
     ],
-    "exec": "npm run run",
+    "exec": "npm run debug",
     "ext": "ts"
   }
 }

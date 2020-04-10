@@ -10,29 +10,6 @@ export module RedisManager {
     return `${type}:${key}`;
   }
 
-  export function scan(pattern: string) {
-    const stream = redis.scanStream({
-      match: pattern,
-      count: 100,
-    });
-
-    return stream;
-
-    stream.on('data', function (resultKeys) {
-      // `resultKeys` is an array of strings representing key names.
-      // Note that resultKeys may contain 0 keys, and that it will sometimes
-      // contain duplicates due to SCAN's implementation in Redis.
-      for (var i = 0; i < resultKeys.length; i++) {
-        console.log(resultKeys[i]);
-      }
-
-      stream.emit('Done');
-    });
-    stream.on('end', function () {
-      console.log('all keys have been visited');
-    });
-  }
-
   /** Fetch redis database and returns object in JSON */
   export async function getObject<T>(key: string): Promise<T> {
     const strValue = await redis.get(key);
@@ -40,15 +17,30 @@ export module RedisManager {
     return JSON.parse(strValue);
   }
 
-  export async function getObjectsAsArray<T>(keyPattern: string) {
-    const keys = await redis.keys(keyPattern);
-    return Promise.all(keys.map((key) => getObject<T>(key)));
+  /** Fetch redis database and returns object in JSON */
+  export async function getManyObjects<T>(keys: string[]): Promise<T[]> {
+    if (!keys) return [];
+
+    const strValues = await redis.mget(...keys);
+    if (!strValues) return [];
+    return strValues.map((strValue) => JSON.parse(strValue));
   }
 
   /** Save object as string format in redis database */
-  export function set(key: string, value: any) {
+  export async function set(key: string, value: any) {
     const strValue = typeof value === 'object' ? JSON.stringify(value) : value;
     redis.set(key, strValue);
+  }
+
+  /** Save object as string format in redis database */
+  export function setMany(dictKeyValue: { [k: string]: any }) {
+    // Stringify values
+    Object.keys(dictKeyValue).forEach((key) => {
+      const value = dictKeyValue[key];
+      dictKeyValue[key] = typeof value === 'object' ? JSON.stringify(value) : value;
+    });
+
+    redis.mset(dictKeyValue);
   }
 
   /** Remove key from database */
@@ -59,6 +51,7 @@ export module RedisManager {
   /** Execute multiple remove functions foreach key that matches pattern */
   export async function removeByKeyPattern(keyPattern: string) {
     const keys = await redis.keys(keyPattern);
+    redis.mget(...['sss', 'ss']);
     keys.forEach(remove);
   }
 }

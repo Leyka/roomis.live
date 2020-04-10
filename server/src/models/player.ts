@@ -1,10 +1,10 @@
 import { kebabCase } from 'lodash';
-import { RedisManager } from '../utils/redis';
+import { BaseModel } from '.';
+import { RedisManager } from '../utils/redis-manager';
 import { Player } from './../../../shared/types';
-import { Model } from './base-model';
 
 /** A Player is associated to a room */
-class PlayerModel extends Model<Player> {
+class PlayerModel extends BaseModel<Player> {
   createPlayer(roomName: string) {
     const player: Player = {
       id: roomName,

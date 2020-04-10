@@ -5,7 +5,7 @@ import * as morgan from 'morgan';
 import * as socketio from 'socket.io';
 import { PORT } from './config';
 import { dispatchEvents } from './router';
-import { LoggerStream } from './utils/logger';
+import { logger, LoggerStream } from './utils/logger';
 
 const app = express();
 const server = new Server(app);
@@ -22,5 +22,5 @@ io.on('connection', dispatchEvents);
 app.use(morgan('combined', { stream: new LoggerStream() }));
 
 server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  logger.info(`Server is running on http://localhost:${PORT}`);
 });
