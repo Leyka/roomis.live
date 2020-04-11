@@ -15,7 +15,17 @@ export interface Video {
   id: string;
   url: string;
   source: Source;
-  addedBy: string;
+  addedByUserId: string;
+}
+
+export type Videos = {
+  [id: string]: Video;
+};
+
+export interface Playlist {
+  id: string;
+  videos: Videos;
+  archive: Videos;
 }
 
 export interface User {
@@ -27,16 +37,11 @@ export interface User {
   canEdit: boolean;
 }
 
-export type PlaylistQueue = {
-  [id: string]: Video;
-};
-
 export interface Room {
   id: string;
   name: string;
   hostId: string;
   guestsCanEdit: boolean;
   userIds: string[];
-  queue?: PlaylistQueue;
   currentPlayingId?: string;
 }

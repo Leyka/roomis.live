@@ -2,6 +2,7 @@ import { kebabCase } from 'lodash';
 import { BaseModel, playerModel, userModel } from '.';
 import { Room, User } from '../../../shared/types';
 import { RedisManager } from '../utils/redis-manager';
+import { playlistModel } from './playlist.model';
 
 class RoomModel extends BaseModel<Room> {
   /** Create or update room when user joins */
@@ -14,6 +15,7 @@ class RoomModel extends BaseModel<Room> {
       // New
       room = this.createRoom(roomName, userId);
       playerModel.createPlayer(roomName);
+      playlistModel.createPlaylist(roomName);
     }
 
     this.save(room);
@@ -37,6 +39,7 @@ class RoomModel extends BaseModel<Room> {
     // Last user? Delete room
     if (Object.keys(room.userIds).length === 0) {
       this.remove(roomName);
+      playerModel.remove(roomName);
       playerModel.remove(roomName);
       return undefined;
     }

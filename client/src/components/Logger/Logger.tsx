@@ -8,24 +8,20 @@ export const Logger: FC = () => {
   useEffect(() => {
     socket.on(LogEvent.Send, (message) =>
       setMessages((messages) => {
-        // Keep maximum 5 elements
-        if (messages.length > 4) {
+        // Keep maximum 2 messages
+        if (messages.length > 2) {
           messages.splice(messages.length - 1, 1);
         }
-        messages.unshift(message);
-        return messages;
+        return [message, ...messages];
       })
     );
   }, []);
 
   return (
     <div>
-      <h4>Logs</h4>
-      <div>
-        {messages.map((message, index) => (
-          <p key={index}>{message}</p>
-        ))}
-      </div>
+      {messages.map((message, index) => (
+        <p key={index}>{message}</p>
+      ))}
     </div>
   );
 };
