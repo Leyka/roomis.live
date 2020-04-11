@@ -14,26 +14,26 @@
 
   .room__playlist {
     grid-area: playlist;
+    background: #eee;
   }
 
   .room__chat {
     grid-area: chat;
+    background: #eee;
   }
 
   .room__logger {
     overflow: auto;
-    height: 250px;
+    height: 100px;
   }
 }
 
 // Desktop
-
 @media only screen and (min-width: 768px) {
   .room {
     display: grid;
-    grid-template-columns: 1fr 4fr 1.5fr;
+    grid-template-columns: 50px 1fr 250px;
     grid-template-rows: auto 1fr;
-    grid-column-gap: 10px;
     grid-template-areas:
       'header header header'
       'playlist main chat';
@@ -45,13 +45,21 @@
   }
 }
 
+// Large screen
+@media only screen and (min-width: 1200px) {
+  .room {
+    grid-template-columns: 240px 1fr 300px;
+  }
+}
+
 // Mobile
 @media only screen and (max-width: 768px) {
   .room__player {
     height: 50vh;
   }
 
-  .room__logger {
+  .room__logger,
+  .room__chat {
     display: none;
   }
 }
