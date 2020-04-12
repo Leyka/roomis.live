@@ -28,7 +28,7 @@ export const Chat: FC = () => {
 
 const StyledServerMessage = styled.p`
   color: #797979;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 300;
 `;
 

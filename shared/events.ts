@@ -1,8 +1,12 @@
+export enum UserEvent {
+  Join = 'user-join',
+  Update = 'user-update',
+  Disconnect = 'disconnect',
+}
+
 export enum RoomEvent {
-  UserJoin = 'room-join',
-  UserUpdate = 'room-update',
+  Update = 'room-update',
   GuestsCanEdit = 'room-can-edit',
-  UserDisconnect = 'disconnect',
 }
 
 export enum PlayerEvent {

@@ -1,6 +1,6 @@
 import { socket } from '@/utils/socket';
 import { PlayerEvent } from '@shared/events';
-import { Player } from '@shared/types';
+import { Player as PlayerType } from '@shared/types';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
@@ -10,14 +10,14 @@ interface Props {
   userIsHost: boolean;
 }
 
-export const LivePlayer: FC<Props> = (props) => {
+export const Player: FC<Props> = (props) => {
   const { roomName, userCanEdit, userIsHost } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    socket.on(PlayerEvent.Init, (playerState: Player) => {
+    socket.on(PlayerEvent.Init, (playerState: PlayerType) => {
       if (playerState.playedSeconds !== 0) {
         playerRef.current?.seekTo(playerState.playedSeconds);
       }

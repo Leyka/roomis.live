@@ -1,7 +1,9 @@
 import { Socket } from 'socket.io';
-import { LogEvent, RoomEvent } from '../../../shared/events';
+import { LogEvent, UserEvent } from '../../../shared/events';
 import { roomModel, userModel } from '../models';
 import { logger } from '../utils/logger';
+import { RoomEvent } from './../../../shared/events';
+import { io } from './../app';
 import { chatModel } from './../models/chat.model';
 
 export module RoomController {
@@ -18,8 +20,8 @@ export module RoomController {
 
     // Update socket
     socket.join(user.room);
-    // Log messages
-    socket.emit(RoomEvent.UserUpdate, user);
+    socket.emit(UserEvent.Update, user);
+    io.in(user.room).emit(RoomEvent.Update, room);
     socket.emit(LogEvent.Send, chatModel.createServerMessage(`Welcome to the room !`));
     socket.broadcast
       .to(user.room)
@@ -49,13 +51,15 @@ export module RoomController {
     if (leavingUser.isHost) {
       const newHost = await userModel.get(room.hostId);
 
-      socket.to(newHost.id).emit(RoomEvent.UserUpdate, newHost);
+      socket.to(newHost.id).emit(UserEvent.Update, newHost);
       messageToTheRoom = `${messageToTheRoom} and ${newHost.name} is the new host`;
     }
 
     socket.broadcast
       .to(leavingUser.room)
       .emit(LogEvent.Send, chatModel.createServerMessage(messageToTheRoom));
+
+    socket.broadcast.to(leavingUser.room).emit(RoomEvent.Update, room);
 
     logger.info(`User ${JSON.stringify(leavingUser)} left room ${leavingUser.room}`);
   }
@@ -75,7 +79,7 @@ export module RoomController {
     Object.values(usersDict).forEach((user) => {
       // Send message to each user (except host) with updated user object
       if (user.isHost) return;
-      socket.to(user.id).emit(RoomEvent.UserUpdate, user);
+      socket.to(user.id).emit(UserEvent.Update, user);
     });
   }
 }

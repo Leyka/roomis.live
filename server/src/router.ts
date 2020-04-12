@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
-import { PlayerEvent, RoomEvent } from '../../shared/events';
+import { PlayerEvent, RoomEvent, UserEvent } from '../../shared/events';
 import { PlayerController } from './controllers/player.controller';
 import { RoomController } from './controllers/room.controller';
 
 export function dispatchEvents(socket: Socket) {
   // --- Room ---
-  socket.on(RoomEvent.UserJoin, ({ roomName }) => RoomController.onRoomJoin(socket, roomName));
-  socket.on(RoomEvent.UserDisconnect, () => RoomController.onRoomDisconnect(socket));
+  socket.on(UserEvent.Join, ({ roomName }) => RoomController.onRoomJoin(socket, roomName));
+  socket.on(UserEvent.Disconnect, () => RoomController.onRoomDisconnect(socket));
   socket.on(RoomEvent.GuestsCanEdit, ({ canEdit }) =>
     RoomController.onGuestsRightChange(socket, canEdit)
   );

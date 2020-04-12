@@ -1,5 +1,5 @@
 import { Alignment, Classes, Navbar, Position, Tag, Toaster } from '@blueprintjs/core';
-import { faCopy, faUser } from '@fortawesome/free-regular-svg-icons';
+import { faCopy, faUserCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { FC } from 'react';
 import styled from 'styled-components';
@@ -10,12 +10,12 @@ const HeadingStyled = styled(Navbar.Heading)`
 `;
 
 const UserIconStyled = styled(FontAwesomeIcon)`
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 `;
 
 const CopyIconStyled = styled(FontAwesomeIcon)`
-  font-size: 1.1rem;
-  color: #e91e63;
+  font-size: 1.2rem;
+  color: #6d6d6d;
   margin-left: 10px;
 
   &:hover {
@@ -32,6 +32,7 @@ interface Props {
 
 const Toast = Toaster.create({
   position: Position.TOP,
+  maxToasts: 1,
 });
 
 export const RoomHeader: FC<Props> = (props) => {
@@ -55,7 +56,6 @@ export const RoomHeader: FC<Props> = (props) => {
             #{roomName}
             <CopyIconStyled
               icon={faCopy}
-              style={{ color: `#${userColor}` }}
               onClick={onCopyIconClick}
               title="Click to copy room link and share it with friends"
             />
@@ -63,7 +63,7 @@ export const RoomHeader: FC<Props> = (props) => {
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
           <HeadingStyled className="sans-serif" style={{ color: `#${userColor}` }}>
-            <UserIconStyled icon={faUser} /> {userName}
+            <UserIconStyled icon={faUserCircle} /> {userName}
           </HeadingStyled>
           {isHost && <Tag className={Classes.INTENT_DANGER}>Host</Tag>}
           {!isHost && <Tag>Guest</Tag>}

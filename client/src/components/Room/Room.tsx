@@ -1,12 +1,14 @@
 import { useRootStore } from '@/store';
 import { socket } from '@/utils/socket';
-import { RoomEvent } from '@shared/events';
+import { RoomEvent, UserEvent } from '@shared/events';
 import { kebabCase } from 'lodash';
 import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Chat } from '../Chat/Chat';
-import { LivePlayer } from '../LivePlayer/LivePlayer';
+import { Controls } from '../Player/Controls';
+import { Player } from '../Player/Player';
+import { Playlist } from '../Playlist/Playlist';
 import { RoomLayout } from './Layout/RoomLayout';
 import { RoomHeader } from './RoomHeader';
 
@@ -18,13 +20,16 @@ export const Room: FC = () => {
   roomStore.roomName = kebabCase(name);
 
   useEffect(() => {
-    socket.emit(RoomEvent.UserJoin, { roomName: roomName });
-    socket.on(RoomEvent.UserUpdate, (user) => userStore.set(user));
+    socket.emit(UserEvent.Join, { roomName: roomName });
+
+    socket.on(UserEvent.Update, (user) => userStore.set(user));
+
+    socket.on(RoomEvent.Update, (room) => roomStore.set(room));
 
     return () => {
-      socket.off(RoomEvent.UserDisconnect);
+      socket.off(UserEvent.Disconnect);
     };
-  }, [roomName, userStore]);
+  }, [roomName, userStore, roomStore]);
 
   return useObserver(() => {
     if (!socket) {
@@ -41,8 +46,9 @@ export const Room: FC = () => {
             userColor={userStore.color}
           />
         }
-        playlist={<div>Playlist</div>}
-        player={<LivePlayer roomName={roomName} userCanEdit userIsHost />}
+        playlist={<Playlist canEdit={userStore.canEdit} />}
+        player={<Player roomName={roomName} userCanEdit userIsHost />}
+        controls={<Controls canEdit={userStore.canEdit} usersCount={roomStore.usersCount} />}
         chat={<Chat />}
       />
     );
