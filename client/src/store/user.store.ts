@@ -8,13 +8,15 @@ export class UserStore {
     this.rootStore = rootStore;
   }
 
-  @observable userName: string = '';
+  @observable name: string = '';
+  @observable color: string = '';
   @observable isHost: boolean = false;
   @observable canEdit: boolean = false;
 
   @action set(user: User) {
-    this.userName = user.name;
+    this.name = user.name;
     this.isHost = user.isHost;
     this.canEdit = user.canEdit;
+    this.color = user.color;
   }
 }

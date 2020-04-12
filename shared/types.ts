@@ -32,6 +32,7 @@ export interface User {
   id: string;
   ip: string;
   name: string;
+  color: string;
   room: string;
   isHost: boolean;
   canEdit: boolean;
@@ -44,4 +45,12 @@ export interface Room {
   guestsCanEdit: boolean;
   userIds: string[];
   currentPlayingId?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  date: Date;
+  fromServer: boolean;
+  fromUserId?: string;
 }
