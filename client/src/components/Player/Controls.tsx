@@ -1,4 +1,4 @@
-import { Button } from '@blueprintjs/core';
+import { Button, Switch } from '@blueprintjs/core';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import { faStepForward } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,26 +18,49 @@ const CountTextStyled = styled.span`
   margin-left: 5px;
 `;
 
+const ControlsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledSwitch = styled(Switch)`
+  margin-bottom: 0;
+  padding-right: 10px;
+  border-right: 1px solid #b9b9b9;
+`;
+
 interface Props {
   canEdit: boolean;
+  isHost: boolean;
+  guestsCanEdit: boolean;
+  onGuestsCanEditClick(): void;
   usersCount: number;
 }
 
 export const Controls: FC<Props> = (props) => {
-  const { canEdit, usersCount: listenersCount } = props;
+  const { isHost, canEdit, usersCount, guestsCanEdit, onGuestsCanEditClick } = props;
 
   return (
     <React.Fragment>
       <ListenersStyled title="Listeners">
         <FontAwesomeIcon icon={faUser} />
-        <CountTextStyled>{listenersCount} watching now</CountTextStyled>
+        <CountTextStyled>{usersCount} watching now</CountTextStyled>
       </ListenersStyled>
-      {canEdit && (
-        <Button minimal small>
-          <SkipTextStyled>Skip</SkipTextStyled>
-          <FontAwesomeIcon icon={faStepForward} />
-        </Button>
-      )}
+      <ControlsContainer>
+        {isHost && (
+          <StyledSwitch
+            checked={guestsCanEdit}
+            label="Guests can edit"
+            onChange={onGuestsCanEditClick}
+          />
+        )}
+        {canEdit && (
+          <Button minimal small>
+            <SkipTextStyled>Skip</SkipTextStyled>
+            <FontAwesomeIcon icon={faStepForward} />
+          </Button>
+        )}
+      </ControlsContainer>
     </React.Fragment>
   );
 };

@@ -40,6 +40,7 @@ export module RedisManager {
       const value = dictKeyValue[key];
       copyDict[key] = typeof value === 'object' ? JSON.stringify(value) : value;
     });
+
     redis.mset(copyDict);
   }
 

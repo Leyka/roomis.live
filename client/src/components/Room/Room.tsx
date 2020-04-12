@@ -7,7 +7,6 @@ import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Chat } from '../Chat/Chat';
 import { Controls } from '../Player/Controls';
-import { Player } from '../Player/Player';
 import { Playlist } from '../Playlist/Playlist';
 import { RoomLayout } from './Layout/RoomLayout';
 import { RoomHeader } from './RoomHeader';
@@ -31,6 +30,10 @@ export const Room: FC = () => {
     };
   }, [roomName, userStore, roomStore]);
 
+  const onGuestsCanEditClick = () => {
+    socket.emit(RoomEvent.GuestsCanEdit, { canEdit: !roomStore.guestsCanEdit });
+  };
+
   return useObserver(() => {
     if (!socket) {
       return <div>Loading...</div>;
@@ -47,8 +50,27 @@ export const Room: FC = () => {
           />
         }
         playlist={<Playlist canEdit={userStore.canEdit} />}
-        player={<Player roomName={roomName} userCanEdit userIsHost />}
-        controls={<Controls canEdit={userStore.canEdit} usersCount={roomStore.usersCount} />}
+        player={
+          <div>
+            player enable me!
+            {/*
+            <Player
+              roomName={roomName}
+              userCanEdit={userStore.canEdit}
+              userIsHost={userStore.isHost}
+            />
+            */}
+          </div>
+        }
+        controls={
+          <Controls
+            isHost={userStore.isHost}
+            canEdit={userStore.canEdit}
+            usersCount={roomStore.usersCount}
+            guestsCanEdit={roomStore.guestsCanEdit}
+            onGuestsCanEditClick={onGuestsCanEditClick}
+          />
+        }
         chat={<Chat />}
       />
     );

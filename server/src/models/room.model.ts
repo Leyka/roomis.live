@@ -97,7 +97,10 @@ class RoomModel extends BaseModel<Room> {
       };
     });
 
-    RedisManager.setMany(updatedUsersDict);
+    if (Object.keys(updatedUsersDict).length > 0) {
+      RedisManager.setMany(updatedUsersDict);
+    }
+
     return updatedUsersDict;
   }
 

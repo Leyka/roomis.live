@@ -71,15 +71,18 @@ export module RoomController {
     const usersDict = await roomModel.setGuestsRight(user.room, canEdit);
     if (!usersDict) return;
 
-    const message = canEdit
-      ? 'Be free! Host granted this room editing access.'
-      : 'Host decided he is the only king in this room... He revoked the editing access.';
-    socket.broadcast.to(user.room).emit(LogEvent.Send, chatModel.createServerMessage(message));
+    const room = await roomModel.get(user.room);
+    io.in(user.room).emit(RoomEvent.Update, room);
 
     Object.values(usersDict).forEach((user) => {
       // Send message to each user (except host) with updated user object
       if (user.isHost) return;
       socket.to(user.id).emit(UserEvent.Update, user);
     });
+
+    const message = canEdit
+      ? 'Guests can now edit playlist and player 🥳'
+      : 'Host revoked the editing access';
+    io.in(user.room).emit(LogEvent.Send, chatModel.createServerMessage(message));
   }
 }

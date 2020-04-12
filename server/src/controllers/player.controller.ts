@@ -10,7 +10,7 @@ export module PlayerController {
 
   export async function onPlayerPlay(socket: Socket, roomName: string) {
     const user = await userModel.get(socket.id);
-    if (!user.canEdit) return;
+    if (!user || !user.canEdit) return;
 
     // Send message to other users in the same room that we asked to Play
     let player = await playerModel.get(roomName);
@@ -23,7 +23,7 @@ export module PlayerController {
 
   export async function onPlayerPause(socket: Socket, roomName: string) {
     const user = await userModel.get(socket.id);
-    if (!user.canEdit) return;
+    if (!user || !user.canEdit) return;
 
     // Send message to other users in the same room that we asked to Pause
     socket.broadcast.to(roomName).emit(PlayerEvent.Pause);
@@ -36,7 +36,7 @@ export module PlayerController {
 
   export async function onPlayerProgress(socket: Socket, roomName: string, playedSeconds: number) {
     const user = await userModel.get(socket.id);
-    if (!user.isHost) return;
+    if (!user || !user.isHost) return;
 
     let player = await playerModel.get(roomName);
     player.playedSeconds = playedSeconds;
