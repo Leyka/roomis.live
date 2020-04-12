@@ -10,7 +10,6 @@ const SkipTextStyled = styled.span`
 `;
 
 const ListenersStyled = styled.div`
-  color: #d42020;
   font-size: 14px;
 `;
 
@@ -23,10 +22,13 @@ const ControlsContainer = styled.div`
   align-items: center;
 `;
 
-const StyledSwitch = styled(Switch)`
+const GuestsSwitchStyled = styled(Switch)`
   margin-bottom: 0;
   padding-right: 10px;
-  border-right: 1px solid #b9b9b9;
+`;
+const ButtonSkipStyled = styled(Button)`
+  padding-left: 10px;
+  border-left: 1px solid #b9b9b9;
 `;
 
 interface Props {
@@ -42,23 +44,23 @@ export const Controls: FC<Props> = (props) => {
 
   return (
     <React.Fragment>
-      <ListenersStyled title="Listeners">
+      <ListenersStyled title="Listeners" style={{ color: usersCount > 1 ? '#f44336' : '#505050' }}>
         <FontAwesomeIcon icon={faUser} />
         <CountTextStyled>{usersCount} watching now</CountTextStyled>
       </ListenersStyled>
       <ControlsContainer>
         {isHost && (
-          <StyledSwitch
+          <GuestsSwitchStyled
             checked={guestsCanEdit}
             label="Guests can edit"
             onChange={onGuestsCanEditClick}
           />
         )}
         {canEdit && (
-          <Button minimal small>
+          <ButtonSkipStyled minimal small>
             <SkipTextStyled>Skip</SkipTextStyled>
             <FontAwesomeIcon icon={faStepForward} />
-          </Button>
+          </ButtonSkipStyled>
         )}
       </ControlsContainer>
     </React.Fragment>

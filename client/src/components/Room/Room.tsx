@@ -7,6 +7,7 @@ import React, { FC, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Chat } from '../Chat/Chat';
 import { Controls } from '../Player/Controls';
+import { Player } from '../Player/Player';
 import { Playlist } from '../Playlist/Playlist';
 import { RoomLayout } from './Layout/RoomLayout';
 import { RoomHeader } from './RoomHeader';
@@ -51,16 +52,11 @@ export const Room: FC = () => {
         }
         playlist={<Playlist canEdit={userStore.canEdit} />}
         player={
-          <div>
-            player enable me!
-            {/*
-            <Player
-              roomName={roomName}
-              userCanEdit={userStore.canEdit}
-              userIsHost={userStore.isHost}
-            />
-            */}
-          </div>
+          <Player
+            roomName={roomName}
+            userCanEdit={userStore.canEdit}
+            userIsHost={userStore.isHost}
+          />
         }
         controls={
           <Controls

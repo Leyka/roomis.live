@@ -4,7 +4,7 @@ $border-color: #d3d4d4;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  min-height: 400px;
+  min-height: 500px;
   background: #f5f5f5;
 
   .room__header {
@@ -29,9 +29,14 @@ $border-color: #d3d4d4;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-right: 1px solid $border-color;
-    border-left: 1px solid $border-color;
     padding: 5px;
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+  }
+
+  .room__player {
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
   }
 }
 

@@ -72,6 +72,7 @@ export const Chat: FC = () => {
   }, [messages]);
 
   const sendMessage = () => {
+    if (!message) return;
     console.log('Sending message...', message);
     setMessage('');
   };
@@ -83,8 +84,6 @@ export const Chat: FC = () => {
       sendMessage();
     }
   };
-
-  console.log({ message });
 
   return (
     <ContainerStyled>
@@ -113,7 +112,7 @@ export const Chat: FC = () => {
             onChange={() => setSendWithEnterKey(!sendWithEnterKey)}
             label="Send with enter key"
           />
-          <Button text="Send" small onClick={sendMessage} disabled={!message} />
+          <Button text="Send" small onClick={sendMessage} />
         </ChatActionStyled>
       </ChatBoxStyled>
     </ContainerStyled>
@@ -122,7 +121,7 @@ export const Chat: FC = () => {
 
 const ServerMessageSyled = styled.p`
   color: #797979;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 300;
 `;
 

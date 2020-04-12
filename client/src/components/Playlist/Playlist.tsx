@@ -3,6 +3,7 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import { AddVideo } from './AddVideo';
 
 const PlaylistHeader = styled.div`
   display: flex;
@@ -42,7 +43,14 @@ export const Playlist: FC<Props> = (props) => {
         )}
       </PlaylistHeader>
       <Divider />
-      <ContainerStyled>Container</ContainerStyled>
+      <ContainerStyled>
+        <AddVideo
+          hidden={!canEdit || !addClicked}
+          isValid
+          onAddClick={(text) => console.log('Added', text)}
+          onCancelClick={() => setAddClicked(false)}
+        />
+      </ContainerStyled>
     </div>
   );
 };

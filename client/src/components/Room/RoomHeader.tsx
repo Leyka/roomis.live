@@ -14,8 +14,7 @@ const UserIconStyled = styled(FontAwesomeIcon)`
 `;
 
 const CopyIconStyled = styled(FontAwesomeIcon)`
-  font-size: 1.2rem;
-  color: #6d6d6d;
+  color: #808080;
   margin-left: 10px;
 
   &:hover {
