@@ -11,9 +11,15 @@ export enum Source {
   SoundCloud = 'soundcloud',
 }
 
-export interface Video {
+export interface VideoInfos {
   id: string;
   url: string;
+  title: string;
+  thumbnail?: string;
+  channel?: string;
+}
+
+export interface Video extends VideoInfos {
   source: Source;
   addedByUserId: string;
 }

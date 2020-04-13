@@ -4,3 +4,5 @@ import { config } from 'dotenv';
 config();
 
 export const PORT = process.env.PORT || 5000;
+
+export const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;

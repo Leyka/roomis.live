@@ -1,8 +1,8 @@
 import { kebabCase } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { BaseModel } from '.';
 import { RedisManager } from '../utils/redis-manager';
-import { Playlist, Source, Video } from './../../../shared/types';
+import { YouTube } from '../utils/youtube';
+import { Playlist, Source, Video, VideoInfos } from './../../../shared/types';
 
 /** A Player is associated to a room */
 class PlaylistModel extends BaseModel<Playlist> {
@@ -21,16 +21,28 @@ class PlaylistModel extends BaseModel<Playlist> {
     const playlist = await this.get(roomName);
     if (!playlist) return;
 
+    const videoInfos = await this.getVideoInfos(source, url);
     const video: Video = {
-      id: uuidv4(),
-      source,
-      url,
+      ...videoInfos,
       addedByUserId,
+      source,
     };
 
     playlist.videos[video.id] = video;
     this.save(playlist);
     return playlist;
+  }
+
+  /** Returns video infos depending of course */
+  async getVideoInfos(source: Source, url: string) {
+    let infos: VideoInfos;
+    switch (source) {
+      case Source.Youtube:
+        infos = await YouTube.getVideoInfos(url);
+        break;
+    }
+
+    return infos;
   }
 
   /** When video finish, add it to archive */

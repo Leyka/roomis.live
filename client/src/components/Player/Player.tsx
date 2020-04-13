@@ -1,7 +1,7 @@
 import { socket } from '@/utils/socket';
 import { PlayerEvent } from '@shared/events';
 import { Player as PlayerType } from '@shared/types';
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { EmptyPlayer } from './Empty';
 
@@ -10,40 +10,27 @@ interface Props {
   canEdit: boolean;
   isHost: boolean;
   videoUrl?: string;
-  playing: boolean;
-  onInit(playing: boolean): void;
-  onPlay(): void;
-  onPause(): void;
   guestsCanEdit: boolean;
   onGuestsCanEditClick(): void;
 }
 
 export const Player: FC<Props> = (props) => {
-  const {
-    roomName,
-    canEdit,
-    isHost,
-    videoUrl,
-    guestsCanEdit,
-    onGuestsCanEditClick,
-    playing,
-    onInit,
-    onPlay,
-    onPause,
-  } = props;
+  const { roomName, canEdit, isHost, videoUrl, guestsCanEdit, onGuestsCanEditClick } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     socket.on(PlayerEvent.Init, (playerState: PlayerType) => {
       if (playerState.playedSeconds !== 0) {
         playerRef.current?.seekTo(playerState.playedSeconds);
       }
-      onInit(playerState.isPlaying);
+
+      setPlaying(playerState.isPlaying);
     });
 
     socket.on(PlayerEvent.Play, ({ playedSeconds }) => {
-      onPlay();
+      setPlaying(true);
       const currentTime = playerRef.current!.getCurrentTime();
       const synced = Math.round(currentTime) === Math.round(playedSeconds);
       if (!synced) {
@@ -51,7 +38,7 @@ export const Player: FC<Props> = (props) => {
       }
     });
 
-    socket.on(PlayerEvent.Pause, onPause);
+    socket.on(PlayerEvent.Pause, () => setPlaying(false));
   }, [playing]);
 
   const onReady = () => {

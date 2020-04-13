@@ -42,4 +42,10 @@ export module PlayerController {
     player.playedSeconds = playedSeconds;
     playerModel.save(player);
   }
+
+  export async function onPrepareToPlay(socket: Socket, roomName: string) {
+    let player = await playerModel.get(roomName);
+    player.isPlaying = true;
+    playerModel.save(player);
+  }
 }

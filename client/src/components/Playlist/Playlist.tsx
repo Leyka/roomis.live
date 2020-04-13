@@ -10,6 +10,7 @@ import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AddVideo } from './AddVideo';
+import { Videos } from './Videos';
 
 const PlaylistHeader = styled.div`
   display: flex;
@@ -91,6 +92,7 @@ export const Playlist: FC<Props> = (props) => {
           onAddClick={onAddVideoClick}
           onCancelClick={onCancelClick}
         />
+        <Videos videos={Object.values(playlistStore.videos)} />
       </ContainerStyled>
     </div>
   ));

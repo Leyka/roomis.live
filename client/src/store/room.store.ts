@@ -12,7 +12,6 @@ export class RoomStore {
   @observable usersCount: number = 1;
   @observable guestsCanEdit: boolean = false;
   @observable videoToPlay: Video | undefined;
-  @observable videoIsPlaying: boolean = false;
 
   @action set(room: Room) {
     this.roomName = room.name;

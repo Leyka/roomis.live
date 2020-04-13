@@ -12,6 +12,9 @@ export function dispatchEvents(socket: Socket) {
     RoomController.onGuestsRightChange(socket, canEdit)
   );
   // --- Player ---
+  socket.on(PlayerEvent.PrepareToPlay, ({ roomName }) =>
+    PlayerController.onPrepareToPlay(socket, roomName)
+  );
   socket.on(PlayerEvent.Ready, ({ roomName }) => PlayerController.onPlayerReady(socket, roomName));
   socket.on(PlayerEvent.Play, ({ roomName }) => PlayerController.onPlayerPlay(socket, roomName));
   socket.on(PlayerEvent.Pause, ({ roomName }) => PlayerController.onPlayerPause(socket, roomName));

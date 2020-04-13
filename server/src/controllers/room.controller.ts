@@ -2,9 +2,10 @@ import { Socket } from 'socket.io';
 import { LogEvent, UserEvent } from '../../../shared/events';
 import { roomModel, userModel } from '../models';
 import { logger } from '../utils/logger';
-import { RoomEvent } from './../../../shared/events';
+import { PlaylistEvent, RoomEvent } from './../../../shared/events';
 import { io } from './../app';
 import { chatModel } from './../models/chat.model';
+import { playlistModel } from './../models/playlist.model';
 
 export module RoomController {
   export async function onRoomJoin(
@@ -17,10 +18,12 @@ export module RoomController {
     const ip = socket.handshake.address;
     const room = await roomModel.join(roomName, socket.id);
     const user = await userModel.createUser(socket.id, ip, room, userName, userColor);
+    const playlist = await playlistModel.get(room.name);
 
     // Update socket
     socket.join(user.room);
     socket.emit(UserEvent.Update, user);
+    socket.emit(PlaylistEvent.Update, playlist);
     io.in(user.room).emit(RoomEvent.Update, room);
     socket.emit(LogEvent.Send, chatModel.createServerMessage(`Welcome to the room !`));
     socket.broadcast

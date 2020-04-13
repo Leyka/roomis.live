@@ -9,6 +9,7 @@ export class PlaylistStore {
   }
 
   @observable videos: Videos = {};
+
   @observable archive: Videos = {};
 
   @action set(playlist: Playlist) {

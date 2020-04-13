@@ -10,6 +10,7 @@ export enum RoomEvent {
 }
 
 export enum PlayerEvent {
+  PrepareToPlay = 'player-prepare-to-play',
   Ready = 'player-ready',
   Init = 'player-init',
   Play = 'player-play',

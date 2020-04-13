@@ -1,6 +1,6 @@
 import { useRootStore } from '@/store';
 import { socket } from '@/utils/socket';
-import { PlaylistEvent, RoomEvent, UserEvent } from '@shared/events';
+import { PlayerEvent, PlaylistEvent, RoomEvent, UserEvent } from '@shared/events';
 import { Playlist as PlaylistType } from '@shared/types';
 import { kebabCase } from 'lodash';
 import { useObserver } from 'mobx-react-lite';
@@ -32,7 +32,7 @@ export const Room: FC = () => {
       const videos = Object.values(playlist.videos);
       if (videos.length === 1) {
         roomStore.videoToPlay = videos[0];
-        roomStore.videoIsPlaying = true;
+        socket.emit(PlayerEvent.PrepareToPlay, { roomName });
       }
     });
 
@@ -43,18 +43,6 @@ export const Room: FC = () => {
 
   const onGuestsCanEditClick = () => {
     socket.emit(RoomEvent.GuestsCanEdit, { canEdit: !roomStore.guestsCanEdit });
-  };
-
-  const onPlay = () => {
-    roomStore.videoIsPlaying = true;
-  };
-
-  const onPause = () => {
-    roomStore.videoIsPlaying = false;
-  };
-
-  const onInit = (playing: boolean) => {
-    roomStore.videoIsPlaying = playing;
   };
 
   return useObserver(() => {
@@ -78,10 +66,6 @@ export const Room: FC = () => {
             isHost={userStore.isHost}
             guestsCanEdit={roomStore.guestsCanEdit}
             onGuestsCanEditClick={onGuestsCanEditClick}
-            playing={roomStore.videoIsPlaying}
-            onInit={onInit}
-            onPlay={onPlay}
-            onPause={onPause}
           />
         }
         controls={

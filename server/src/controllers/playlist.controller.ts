@@ -15,7 +15,7 @@ export module PlaylistController {
     const user = await userModel.get(socket.id);
     if (!user || !user.canEdit) return;
     // Add video and update playlist
-    const playlist = await playlistModel.addVideo(roomName, source, videoUrl, socket.id);
+    const playlist = await playlistModel.addVideo(roomName, source, videoUrl, user.id);
     if (!playlist) return;
     // Broadcast to everyone that playlist has changed
     io.in(roomName).emit(PlaylistEvent.Update, playlist);
