@@ -15,15 +15,15 @@ const MediaIconsStyled = styled.div`
   margin-bottom: 5px;
 `;
 
-interface Props {
-  hidden: boolean;
+export interface AddVideoProps {
+  hidden?: boolean;
   isYoutubeUrl: boolean;
   validateUrl(url: string): void;
   onAddClick(url: string): void;
   onCancelClick(): void;
 }
 
-export const AddVideo: FC<Props> = (props) => {
+export const AddVideo: FC<AddVideoProps> = (props) => {
   const [textUrlInput, setTextUrlInput] = useState('');
   const { hidden, isYoutubeUrl, onAddClick, validateUrl, onCancelClick } = props;
   const refTextInput = useRef<HTMLInputElement>(null);

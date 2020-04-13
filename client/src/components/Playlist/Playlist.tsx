@@ -10,6 +10,7 @@ import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AddVideo } from './AddVideo';
+import { AddVideoDialog } from './AddVideoDialog';
 import { Videos } from './Videos';
 
 const PlaylistHeader = styled.div`
@@ -45,7 +46,8 @@ interface Props {
 
 export const Playlist: FC<Props> = (props) => {
   const { playlistStore, roomStore } = useRootStore();
-  const [addClicked, setAddClicked] = useState(false);
+  const [isOpenDiv, setIsOpenDiv] = useState(false);
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
   const [isValidYoutubeUrl, setIsValidYoutubeUrl] = useState(false);
   const [isMediumScreen, setIsMediumScreen] = useState(false);
   const { canEdit, roomName } = props;
@@ -83,17 +85,25 @@ export const Playlist: FC<Props> = (props) => {
     }
 
     socket.emit(PlaylistEvent.NewVideo, { roomName, source, videoUrl });
-    setAddClicked(false);
-    setIsValidYoutubeUrl(false);
+    resetState();
   };
 
   const onCancelClick = () => {
-    setAddClicked(false);
+    resetState();
+  };
+
+  const resetState = () => {
+    setIsOpenDialog(false);
+    setIsOpenDiv(false);
     setIsValidYoutubeUrl(false);
   };
 
   const onDeleteVideoClick = (videoId: string) => {
     socket.emit(PlaylistEvent.DeleteVideo, { roomName, videoId });
+  };
+
+  const onOpenAddButton = () => {
+    isMediumScreen ? setIsOpenDialog(true) : setIsOpenDiv(true);
   };
 
   return useObserver(() => (
@@ -102,20 +112,31 @@ export const Playlist: FC<Props> = (props) => {
         {isMediumScreen && <SmallTextPlaylistStyled>PLAYLIST</SmallTextPlaylistStyled>}
         {!isMediumScreen && <H4Styled>Playlist</H4Styled>}
         {canEdit && (
-          <Button minimal onClick={() => setAddClicked(true)} title="Add new video to playlist">
+          <Button minimal onClick={onOpenAddButton} title="Add new video to playlist">
             <AddIconStyled icon={faPlusCircle} color="#8ac797" />
           </Button>
         )}
       </PlaylistHeader>
       <Divider />
       <ContainerStyled>
-        <AddVideo
-          hidden={!canEdit || !addClicked}
-          isYoutubeUrl={isValidYoutubeUrl}
-          validateUrl={validateUrl}
-          onAddClick={onAddVideoClick}
-          onCancelClick={onCancelClick}
-        />
+        {canEdit && (
+          <React.Fragment>
+            <AddVideoDialog
+              isOpen={isOpenDialog}
+              isYoutubeUrl={isValidYoutubeUrl}
+              validateUrl={validateUrl}
+              onAddClick={onAddVideoClick}
+              onCancelClick={onCancelClick}
+            />
+            <AddVideo
+              hidden={isMediumScreen || !isOpenDiv}
+              isYoutubeUrl={isValidYoutubeUrl}
+              validateUrl={validateUrl}
+              onAddClick={onAddVideoClick}
+              onCancelClick={onCancelClick}
+            />
+          </React.Fragment>
+        )}
         <Videos
           videos={Object.values(playlistStore.videos)}
           onDeleteVideoClick={onDeleteVideoClick}
