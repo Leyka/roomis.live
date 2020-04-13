@@ -33,6 +33,15 @@ class PlaylistModel extends BaseModel<Playlist> {
     return playlist;
   }
 
+  async deleteVideo(roomName: string, videoId: string) {
+    const playlist = await this.get(roomName);
+    if (!playlist) return;
+
+    delete playlist.videos[videoId];
+    this.save(playlist);
+    return playlist;
+  }
+
   /** Returns video infos depending of course */
   async getVideoInfos(source: Source, url: string) {
     let infos: VideoInfos;

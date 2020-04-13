@@ -22,6 +22,10 @@ const CopyIconStyled = styled(FontAwesomeIcon)`
   }
 `;
 
+const RoleTagStyled = styled(Tag)`
+  line-height: normal;
+`;
+
 interface Props {
   roomName: string;
   userName: string;
@@ -65,9 +69,11 @@ export const RoomHeader: FC<Props> = (props) => {
           <HeadingStyled className="sans-serif" style={{ color: `#${userColor}` }}>
             <UserIconStyled icon={faUserCircle} /> {userName}
           </HeadingStyled>
-          {isHost && <Tag className={Classes.INTENT_DANGER}>Host</Tag>}
-          {!isHost && canEdit && <Tag className={Classes.INTENT_PRIMARY}>Super Guest</Tag>}
-          {!isHost && !canEdit && <Tag>Guest</Tag>}
+          {isHost && <RoleTagStyled className={Classes.INTENT_DANGER}>Host</RoleTagStyled>}
+          {!isHost && canEdit && (
+            <RoleTagStyled className={Classes.INTENT_PRIMARY}>Super Guest</RoleTagStyled>
+          )}
+          {!isHost && !canEdit && <RoleTagStyled>Guest</RoleTagStyled>}
         </Navbar.Group>
       </Navbar>
     </React.Fragment>

@@ -73,6 +73,10 @@ export const Playlist: FC<Props> = (props) => {
     setIsValidYoutubeUrl(false);
   };
 
+  const onDeleteVideoClick = (videoId: string) => {
+    socket.emit(PlaylistEvent.DeleteVideo, { roomName, videoId });
+  };
+
   return useObserver(() => (
     <div>
       <PlaylistHeader>
@@ -92,7 +96,10 @@ export const Playlist: FC<Props> = (props) => {
           onAddClick={onAddVideoClick}
           onCancelClick={onCancelClick}
         />
-        <Videos videos={Object.values(playlistStore.videos)} />
+        <Videos
+          videos={Object.values(playlistStore.videos)}
+          onDeleteVideoClick={onDeleteVideoClick}
+        />
       </ContainerStyled>
     </div>
   ));

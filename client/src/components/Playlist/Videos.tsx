@@ -13,28 +13,26 @@ const ContainerStyled = styled.div`
 
 interface VideosProps {
   videos: Video[];
+  onDeleteVideoClick(videoId: string): void;
 }
 
 export const Videos: FC<VideosProps> = (props) => {
-  const { videos } = props;
-  const empty = videos.length === 0;
+  const { videos, onDeleteVideoClick } = props;
+  const isEmpty = videos.length === 0;
+
   return (
     <ContainerStyled>
-      {empty && <p>No videos yet.</p>}
-      {!empty && (
+      {isEmpty && <p>No videos yet.</p>}
+      {!isEmpty && (
         <div>
           {videos.map((video) => (
-            <VideoCard video={video} key={video.id} />
+            <VideoCard video={video} key={video.id} onDeleteVideoClick={onDeleteVideoClick} />
           ))}
         </div>
       )}
     </ContainerStyled>
   );
 };
-
-interface VideoCardProps {
-  video: Video;
-}
 
 const VideoCardStyled = styled(Card)`
   margin-bottom: 10px;
@@ -68,8 +66,14 @@ const CardFooterStyled = styled.div`
   color: #5c7080;
 `;
 
+interface VideoCardProps {
+  video: Video;
+  onDeleteVideoClick(videoId: string): void;
+}
+
 export const VideoCard: FC<VideoCardProps> = (props) => {
-  const { video } = props;
+  const { video, onDeleteVideoClick } = props;
+
   return (
     <VideoCardStyled interactive elevation={Elevation.ONE}>
       <TwoColumnsStyled>
@@ -84,7 +88,7 @@ export const VideoCard: FC<VideoCardProps> = (props) => {
       <CardFooterStyled>
         <FontAwesomeIcon
           icon={faTrashAlt}
-          onClick={() => console.log('Deleting')}
+          onClick={() => onDeleteVideoClick(video.id)}
           title={`Delete ${video.title}`}
         />
       </CardFooterStyled>

@@ -30,7 +30,9 @@ export const Room: FC = () => {
     socket.on(PlaylistEvent.Update, (playlist: PlaylistType) => {
       // If we have only one song in playlist, play it now
       const videos = Object.values(playlist.videos);
-      if (videos.length === 1) {
+      if (videos.length === 0) {
+        roomStore.videoToPlay = undefined;
+      } else if (videos.length === 1) {
         roomStore.videoToPlay = videos[0];
         socket.emit(PlayerEvent.PrepareToPlay, { roomName });
       }
