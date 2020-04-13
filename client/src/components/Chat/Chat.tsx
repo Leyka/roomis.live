@@ -13,7 +13,7 @@ const ContainerStyled = styled.div`
 `;
 
 const MessagesStyled = styled.div`
-  height: 77vh;
+  max-height: 77vh;
   overflow-y: auto;
   padding: 10px;
   vertical-align: baseline;

@@ -11,6 +11,12 @@ body {
   font-size: 14px;
 }
 
+button {
+  &:focus {
+    outline: none;
+  }
+}
+
 // Useful classes
 .sans-serif {
   font-family: 'Playfair Display', sans-serif;

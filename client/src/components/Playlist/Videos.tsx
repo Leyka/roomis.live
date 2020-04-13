@@ -1,4 +1,4 @@
-import { Card, Elevation } from '@blueprintjs/core';
+import { Callout, Card, Elevation } from '@blueprintjs/core';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Video } from '@shared/types';
@@ -7,26 +7,32 @@ import styled from 'styled-components';
 
 const ContainerStyled = styled.div`
   margin-top: 20px;
-  max-height: 800px;
+  max-height: 85vh;
   overflow-y: auto;
 `;
 
 interface VideosProps {
   videos: Video[];
+  videoPlayingId?: string;
   onDeleteVideoClick(videoId: string): void;
 }
 
 export const Videos: FC<VideosProps> = (props) => {
-  const { videos, onDeleteVideoClick } = props;
+  const { videos, videoPlayingId, onDeleteVideoClick } = props;
   const isEmpty = videos.length === 0;
 
   return (
     <ContainerStyled>
-      {isEmpty && <p>No videos yet.</p>}
+      {isEmpty && <Callout>No videos yet</Callout>}
       {!isEmpty && (
         <div>
           {videos.map((video) => (
-            <VideoCard video={video} key={video.id} onDeleteVideoClick={onDeleteVideoClick} />
+            <VideoCard
+              video={video}
+              key={video.id}
+              onDeleteVideoClick={onDeleteVideoClick}
+              videoPlayingId={videoPlayingId}
+            />
           ))}
         </div>
       )}
@@ -68,14 +74,21 @@ const CardFooterStyled = styled.div`
 
 interface VideoCardProps {
   video: Video;
+  videoPlayingId?: string;
   onDeleteVideoClick(videoId: string): void;
 }
 
 export const VideoCard: FC<VideoCardProps> = (props) => {
-  const { video, onDeleteVideoClick } = props;
+  const { video, videoPlayingId, onDeleteVideoClick } = props;
+
+  const playing = videoPlayingId && videoPlayingId === video.id;
 
   return (
-    <VideoCardStyled interactive elevation={Elevation.ONE}>
+    <VideoCardStyled
+      interactive
+      elevation={Elevation.ONE}
+      style={{ background: playing ? '#eaeaea' : 'inherit' }}
+    >
       <TwoColumnsStyled>
         <div>
           <ThumbnailStyled src={video.thumbnail} width="80" />

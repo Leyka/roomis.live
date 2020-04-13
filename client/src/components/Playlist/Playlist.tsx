@@ -39,7 +39,7 @@ interface Props {
 }
 
 export const Playlist: FC<Props> = (props) => {
-  const { playlistStore } = useRootStore();
+  const { playlistStore, roomStore } = useRootStore();
   const [addClicked, setAddClicked] = useState(false);
   const [isValidYoutubeUrl, setIsValidYoutubeUrl] = useState(false);
   const { canEdit, roomName } = props;
@@ -80,7 +80,7 @@ export const Playlist: FC<Props> = (props) => {
   return useObserver(() => (
     <div>
       <PlaylistHeader>
-        <H4Styled>Playlist</H4Styled>
+        <H4Styled>Playlist </H4Styled>
         {canEdit && (
           <Button minimal title="Add new video to playlist" onClick={() => setAddClicked(true)}>
             <AddIconStyled icon={faPlusCircle} />
@@ -99,6 +99,7 @@ export const Playlist: FC<Props> = (props) => {
         <Videos
           videos={Object.values(playlistStore.videos)}
           onDeleteVideoClick={onDeleteVideoClick}
+          videoPlayingId={roomStore.videoToPlay?.id}
         />
       </ContainerStyled>
     </div>

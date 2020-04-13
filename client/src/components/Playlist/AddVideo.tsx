@@ -43,6 +43,7 @@ export const AddVideo: FC<Props> = (props) => {
         />
       </MediaIconsStyled>
       <InputTextStyled
+        autoFocus
         placeholder="Paste YouTube URL here"
         value={textUrlInput}
         onChange={(e) => setTextUrlInput(e.target.value)}

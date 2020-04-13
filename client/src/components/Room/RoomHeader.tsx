@@ -69,11 +69,17 @@ export const RoomHeader: FC<Props> = (props) => {
           <HeadingStyled className="sans-serif" style={{ color: `#${userColor}` }}>
             <UserIconStyled icon={faUserCircle} /> {userName}
           </HeadingStyled>
-          {isHost && <RoleTagStyled className={Classes.INTENT_DANGER}>Host</RoleTagStyled>}
-          {!isHost && canEdit && (
-            <RoleTagStyled className={Classes.INTENT_PRIMARY}>Super Guest</RoleTagStyled>
+          {isHost && (
+            <RoleTagStyled className={Classes.INTENT_DANGER} round>
+              Host
+            </RoleTagStyled>
           )}
-          {!isHost && !canEdit && <RoleTagStyled>Guest</RoleTagStyled>}
+          {!isHost && canEdit && (
+            <RoleTagStyled className={Classes.INTENT_PRIMARY} round>
+              Super Guest
+            </RoleTagStyled>
+          )}
+          {!isHost && !canEdit && <RoleTagStyled round>Guest</RoleTagStyled>}
         </Navbar.Group>
       </Navbar>
     </React.Fragment>
