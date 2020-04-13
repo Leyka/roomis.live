@@ -1,10 +1,10 @@
-import { Button, ButtonGroup, InputGroup } from '@blueprintjs/core';
+import { Button, ButtonGroup } from '@blueprintjs/core';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-const InputTextStyled = styled(InputGroup)`
+const InputTextStyled = styled.input`
   margin-bottom: 10px;
 `;
 
@@ -26,8 +26,10 @@ interface Props {
 export const AddVideo: FC<Props> = (props) => {
   const [textUrlInput, setTextUrlInput] = useState('');
   const { hidden, isYoutubeUrl, onAddClick, validateUrl, onCancelClick } = props;
+  const refTextInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    refTextInput.current?.focus();
     return () => {
       setTextUrlInput('');
     };
@@ -43,11 +45,14 @@ export const AddVideo: FC<Props> = (props) => {
         />
       </MediaIconsStyled>
       <InputTextStyled
+        className="styled"
         autoFocus
+        type="text"
         placeholder="Paste YouTube URL here"
         value={textUrlInput}
         onChange={(e) => setTextUrlInput(e.target.value)}
         onKeyUpCapture={() => validateUrl(textUrlInput)}
+        ref={refTextInput}
       />
       <ButtonGroup fill>
         <Button
