@@ -15,15 +15,16 @@ interface VideosProps {
   videos: Video[];
   videoPlayingId?: string;
   onDeleteVideoClick(videoId: string): void;
+  isMediumScreen: boolean;
 }
 
 export const Videos: FC<VideosProps> = (props) => {
-  const { videos, videoPlayingId, onDeleteVideoClick } = props;
+  const { videos, videoPlayingId, onDeleteVideoClick, isMediumScreen } = props;
   const isEmpty = videos.length === 0;
 
   return (
     <ContainerStyled>
-      {isEmpty && <Callout>No videos yet</Callout>}
+      {isEmpty && !isMediumScreen && <Callout>No videos yet</Callout>}
       {!isEmpty && (
         <div>
           {videos.map((video) => (

@@ -42,11 +42,25 @@ export const Playlist: FC<Props> = (props) => {
   const { playlistStore, roomStore } = useRootStore();
   const [addClicked, setAddClicked] = useState(false);
   const [isValidYoutubeUrl, setIsValidYoutubeUrl] = useState(false);
+  const [isMediumScreen, setIsMediumScreen] = useState(false);
   const { canEdit, roomName } = props;
 
   useEffect(() => {
     socket.on(PlaylistEvent.Update, (playlist) => playlistStore.set(playlist));
   }, [playlistStore]);
+
+  useEffect(() => {
+    const updateIsMediumScreen = () => {
+      setIsMediumScreen(window.innerWidth >= 768 && window.innerWidth <= 1200);
+    };
+
+    updateIsMediumScreen();
+
+    window.addEventListener('resize', updateIsMediumScreen);
+    return () => {
+      window.removeEventListener('resize', updateIsMediumScreen);
+    };
+  }, []);
 
   const validateUrl = (url: string) => {
     const isValidYouTube = isValidYouTubeUrl(url);
@@ -80,10 +94,10 @@ export const Playlist: FC<Props> = (props) => {
   return useObserver(() => (
     <div>
       <PlaylistHeader>
-        <H4Styled>Playlist </H4Styled>
+        {!isMediumScreen && <H4Styled>Playlist</H4Styled>}
         {canEdit && (
-          <Button minimal title="Add new video to playlist" onClick={() => setAddClicked(true)}>
-            <AddIconStyled icon={faPlusCircle} />
+          <Button minimal onClick={() => setAddClicked(true)} title="Add new video to playlist">
+            <AddIconStyled icon={faPlusCircle} color="#8ac797" />
           </Button>
         )}
       </PlaylistHeader>
@@ -100,6 +114,7 @@ export const Playlist: FC<Props> = (props) => {
           videos={Object.values(playlistStore.videos)}
           onDeleteVideoClick={onDeleteVideoClick}
           videoPlayingId={roomStore.videoToPlay?.id}
+          isMediumScreen={isMediumScreen}
         />
       </ContainerStyled>
     </div>

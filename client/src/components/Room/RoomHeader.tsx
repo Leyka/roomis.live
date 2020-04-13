@@ -24,6 +24,7 @@ const CopyIconStyled = styled(FontAwesomeIcon)`
 
 const RoleTagStyled = styled(Tag)`
   line-height: normal;
+  margin-top: 2px;
 `;
 
 interface Props {
