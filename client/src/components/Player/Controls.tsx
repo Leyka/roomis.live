@@ -47,10 +47,21 @@ interface Props {
   guestsCanEdit: boolean;
   onGuestsCanEditClick(): void;
   usersCount: number;
+  skipDisabled: boolean;
+  onSkipClick(): void;
 }
 
 export const Controls: FC<Props> = (props) => {
-  const { hidden, isHost, canEdit, usersCount, guestsCanEdit, onGuestsCanEditClick } = props;
+  const {
+    hidden,
+    isHost,
+    canEdit,
+    usersCount,
+    guestsCanEdit,
+    onGuestsCanEditClick,
+    skipDisabled,
+    onSkipClick,
+  } = props;
 
   return (
     <ContainerStyled style={{ display: hidden ? 'none' : 'flex' }}>
@@ -70,7 +81,7 @@ export const Controls: FC<Props> = (props) => {
           />
         )}
         {canEdit && (
-          <ButtonSkipStyled minimal small>
+          <ButtonSkipStyled minimal small disabled={skipDisabled} onClick={onSkipClick}>
             <SkipTextStyled>Skip</SkipTextStyled>
             <FontAwesomeIcon icon={faStepForward} />
           </ButtonSkipStyled>

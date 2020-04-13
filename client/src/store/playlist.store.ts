@@ -1,5 +1,5 @@
 import { Playlist, Videos } from '@shared/types';
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { RootStore } from './index';
 
 export class PlaylistStore {
@@ -15,5 +15,9 @@ export class PlaylistStore {
   @action set(playlist: Playlist) {
     this.videos = playlist.videos;
     this.archive = playlist.archive;
+  }
+
+  @computed get videosSize() {
+    return Object.keys(this.videos).length;
   }
 }

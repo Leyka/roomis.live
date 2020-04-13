@@ -14,12 +14,13 @@ const ContainerStyled = styled.div`
 interface VideosProps {
   videos: Video[];
   videoPlayingId?: string;
-  onDeleteVideoClick(videoId: string): void;
   isMediumScreen: boolean;
+  canEdit: boolean;
+  onDeleteVideoClick(videoId: string): void;
 }
 
 export const Videos: FC<VideosProps> = (props) => {
-  const { videos, videoPlayingId, onDeleteVideoClick, isMediumScreen } = props;
+  const { videos, videoPlayingId, onDeleteVideoClick, isMediumScreen, canEdit } = props;
   const isEmpty = videos.length === 0;
 
   return (
@@ -34,6 +35,7 @@ export const Videos: FC<VideosProps> = (props) => {
               onDeleteVideoClick={onDeleteVideoClick}
               videoPlayingId={videoPlayingId}
               isMediumScreen={isMediumScreen}
+              canEdit={canEdit}
             />
           ))}
         </div>
@@ -80,15 +82,13 @@ const CardFooterStyled = styled.div`
   color: #5c7080;
 `;
 
-interface VideoCardProps {
+type SharedVideoCardProps = Omit<VideosProps, 'videos'>;
+interface VideoCardProps extends SharedVideoCardProps {
   video: Video;
-  videoPlayingId?: string;
-  onDeleteVideoClick(videoId: string): void;
-  isMediumScreen: boolean;
 }
 
 export const VideoCard: FC<VideoCardProps> = (props) => {
-  const { video, videoPlayingId, onDeleteVideoClick, isMediumScreen } = props;
+  const { video, videoPlayingId, onDeleteVideoClick, isMediumScreen, canEdit } = props;
 
   const playing = videoPlayingId && videoPlayingId === video.id;
 
@@ -116,11 +116,13 @@ export const VideoCard: FC<VideoCardProps> = (props) => {
         </div>
       </TwoColumnsStyled>
       <CardFooterStyled>
-        <FontAwesomeIcon
-          icon={faTrashAlt}
-          onClick={() => onDeleteVideoClick(video.id)}
-          title={`Delete ${video.title}`}
-        />
+        {canEdit && (
+          <FontAwesomeIcon
+            icon={faTrashAlt}
+            onClick={() => onDeleteVideoClick(video.id)}
+            title={`Delete ${video.title}`}
+          />
+        )}
       </CardFooterStyled>
     </VideoCardStyled>
   );

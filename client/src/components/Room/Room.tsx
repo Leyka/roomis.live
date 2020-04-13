@@ -14,7 +14,7 @@ import { RoomLayout } from './Layout/RoomLayout';
 import { RoomHeader } from './RoomHeader';
 
 export const Room: FC = () => {
-  const { roomStore, userStore } = useRootStore();
+  const { roomStore, userStore, playlistStore } = useRootStore();
   const { roomName } = roomStore;
   // Returns name of the room that users entered in URL bar
   const { name } = useParams();
@@ -47,6 +47,11 @@ export const Room: FC = () => {
     socket.emit(RoomEvent.GuestsCanEdit, { canEdit: !roomStore.guestsCanEdit });
   };
 
+  const onSkipVideoClick = () => {
+    if (!roomStore.videoToPlay || playlistStore.videosSize <= 1) return;
+    socket.emit(PlaylistEvent.SkipVideo, { roomName, videoId: roomStore.videoToPlay.id });
+  };
+
   return useObserver(() => {
     return (
       <RoomLayout
@@ -59,7 +64,7 @@ export const Room: FC = () => {
             userColor={userStore.color}
           />
         }
-        playlist={<Playlist roomName={roomName} canEdit={userStore.canEdit} />}
+        playlist={<Playlist />}
         player={
           <Player
             videoUrl={roomStore.videoToPlay?.url}
@@ -78,6 +83,8 @@ export const Room: FC = () => {
             usersCount={roomStore.usersCount}
             guestsCanEdit={roomStore.guestsCanEdit}
             onGuestsCanEditClick={onGuestsCanEditClick}
+            skipDisabled={playlistStore.videosSize <= 1}
+            onSkipClick={onSkipVideoClick}
           />
         }
         chat={<Chat />}

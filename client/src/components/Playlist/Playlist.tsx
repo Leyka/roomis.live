@@ -39,18 +39,16 @@ const SmallTextPlaylistStyled = styled.small`
   margin-bottom: 5px;
 `;
 
-interface Props {
-  roomName: string;
-  canEdit: boolean;
-}
-
-export const Playlist: FC<Props> = (props) => {
-  const { playlistStore, roomStore } = useRootStore();
+export const Playlist: FC = () => {
+  // Global state
+  const { playlistStore, roomStore, userStore } = useRootStore();
+  const { roomName } = roomStore;
+  const { canEdit } = userStore;
+  // Local state
   const [isOpenDiv, setIsOpenDiv] = useState(false);
   const [isOpenDialog, setIsOpenDialog] = useState(false);
   const [isValidYoutubeUrl, setIsValidYoutubeUrl] = useState(false);
   const [isMediumScreen, setIsMediumScreen] = useState(false);
-  const { canEdit, roomName } = props;
 
   useEffect(() => {
     socket.on(PlaylistEvent.Update, (playlist) => playlistStore.set(playlist));
@@ -142,6 +140,7 @@ export const Playlist: FC<Props> = (props) => {
           onDeleteVideoClick={onDeleteVideoClick}
           videoPlayingId={roomStore.videoToPlay?.id}
           isMediumScreen={isMediumScreen}
+          canEdit={canEdit}
         />
       </ContainerStyled>
     </div>

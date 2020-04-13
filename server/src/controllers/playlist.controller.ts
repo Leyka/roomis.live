@@ -18,6 +18,12 @@ export module PlaylistController {
     await checkRightsThenBroadcast(socket, roomName, deleteFn);
   }
 
+  export async function onSkipVideo(socket: Socket, roomName: string, videoId: string) {
+    const moveToArchive = true;
+    const skipFn = async () => playlistModel.deleteVideo(roomName, videoId, moveToArchive);
+    await checkRightsThenBroadcast(socket, roomName, skipFn);
+  }
+
   async function checkRightsThenBroadcast(
     socket: Socket,
     roomName: string,

@@ -28,4 +28,7 @@ export function dispatchEvents(socket: Socket) {
   socket.on(PlaylistEvent.DeleteVideo, ({ roomName, videoId }) =>
     PlaylistController.onDeleteVideo(socket, roomName, videoId)
   );
+  socket.on(PlaylistEvent.SkipVideo, ({ roomName, videoId }) =>
+    PlaylistController.onSkipVideo(socket, roomName, videoId)
+  );
 }

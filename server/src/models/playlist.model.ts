@@ -33,11 +33,17 @@ class PlaylistModel extends BaseModel<Playlist> {
     return playlist;
   }
 
-  async deleteVideo(roomName: string, videoId: string) {
+  async deleteVideo(roomName: string, videoId: string, moveToArchive = false) {
     const playlist = await this.get(roomName);
     if (!playlist) return;
 
+    const video = { ...playlist.videos[videoId] };
     delete playlist.videos[videoId];
+
+    if (moveToArchive) {
+      playlist.archive[video.id] = video;
+    }
+
     this.save(playlist);
     return playlist;
   }
@@ -52,18 +58,6 @@ class PlaylistModel extends BaseModel<Playlist> {
     }
 
     return infos;
-  }
-
-  /** When video finish, add it to archive */
-  async moveVideoToArchive(roomName: string, video: Video) {
-    const playlist = await this.get(roomName);
-    if (!playlist) return;
-
-    delete playlist.videos[video.id];
-    playlist.archive[video.id] = video;
-
-    this.save(playlist);
-    return playlist;
   }
 
   /** Returns key of player. Example if roomName is 'foo' it would return 'player:foo' */

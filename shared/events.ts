@@ -23,6 +23,7 @@ export enum PlaylistEvent {
   NewVideo = 'playlist-new-video',
   Update = 'playlist-update',
   DeleteVideo = 'playlist-delete-video',
+  SkipVideo = 'playlist-skip-video',
 }
 
 export enum LogEvent {
