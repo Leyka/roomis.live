@@ -1,7 +1,8 @@
 import { kebabCase } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import { BaseModel } from '.';
 import { RedisManager } from '../utils/redis-manager';
-import { Playlist, Video } from './../../../shared/types';
+import { Playlist, Source, Video } from './../../../shared/types';
 
 /** A Player is associated to a room */
 class PlaylistModel extends BaseModel<Playlist> {
@@ -16,11 +17,18 @@ class PlaylistModel extends BaseModel<Playlist> {
     return playlist;
   }
 
-  async addVideo(roomName: string, video: Video) {
+  async addVideo(roomName: string, source: Source, url: string, addedByUserId: string) {
     const playlist = await this.get(roomName);
     if (!playlist) return;
 
-    playlist[video.id] = video;
+    const video: Video = {
+      id: uuidv4(),
+      source,
+      url,
+      addedByUserId,
+    };
+
+    playlist.videos[video.id] = video;
     this.save(playlist);
     return playlist;
   }

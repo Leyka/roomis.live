@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io';
-import { PlayerEvent, RoomEvent, UserEvent } from '../../shared/events';
+import { PlayerEvent, PlaylistEvent, RoomEvent, UserEvent } from '../../shared/events';
 import { PlayerController } from './controllers/player.controller';
+import { PlaylistController } from './controllers/playlist.controller';
 import { RoomController } from './controllers/room.controller';
 
 export function dispatchEvents(socket: Socket) {
@@ -16,5 +17,9 @@ export function dispatchEvents(socket: Socket) {
   socket.on(PlayerEvent.Pause, ({ roomName }) => PlayerController.onPlayerPause(socket, roomName));
   socket.on(PlayerEvent.Progress, ({ roomName, playedSeconds }) =>
     PlayerController.onPlayerProgress(socket, roomName, playedSeconds)
+  );
+  // --- Playlist ---
+  socket.on(PlaylistEvent.NewVideo, ({ roomName, source, videoUrl }) =>
+    PlaylistController.onNewVideo(socket, roomName, source, videoUrl)
   );
 }

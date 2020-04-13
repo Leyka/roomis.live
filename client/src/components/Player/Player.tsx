@@ -1,31 +1,49 @@
 import { socket } from '@/utils/socket';
 import { PlayerEvent } from '@shared/events';
 import { Player as PlayerType } from '@shared/types';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
+import { EmptyPlayer } from './Empty';
 
 interface Props {
   roomName: string;
-  userCanEdit: boolean;
-  userIsHost: boolean;
+  canEdit: boolean;
+  isHost: boolean;
+  videoUrl?: string;
+  playing: boolean;
+  onInit(playing: boolean): void;
+  onPlay(): void;
+  onPause(): void;
+  guestsCanEdit: boolean;
+  onGuestsCanEditClick(): void;
 }
 
 export const Player: FC<Props> = (props) => {
-  const { roomName, userCanEdit, userIsHost } = props;
+  const {
+    roomName,
+    canEdit,
+    isHost,
+    videoUrl,
+    guestsCanEdit,
+    onGuestsCanEditClick,
+    playing,
+    onInit,
+    onPlay,
+    onPause,
+  } = props;
 
   const playerRef = useRef<ReactPlayer>(null);
-  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     socket.on(PlayerEvent.Init, (playerState: PlayerType) => {
       if (playerState.playedSeconds !== 0) {
         playerRef.current?.seekTo(playerState.playedSeconds);
       }
-      setPlaying(playerState.isPlaying);
+      onInit(playerState.isPlaying);
     });
 
     socket.on(PlayerEvent.Play, ({ playedSeconds }) => {
-      setPlaying(true);
+      onPlay();
       const currentTime = playerRef.current!.getCurrentTime();
       const synced = Math.round(currentTime) === Math.round(playedSeconds);
       if (!synced) {
@@ -33,36 +51,47 @@ export const Player: FC<Props> = (props) => {
       }
     });
 
-    socket.on(PlayerEvent.Pause, () => setPlaying(false));
+    socket.on(PlayerEvent.Pause, onPause);
   }, [playing]);
 
   const onReady = () => {
     socket.emit(PlayerEvent.Ready, { roomName });
   };
 
-  const onPlay = () => {
-    userCanEdit && socket.emit(PlayerEvent.Play, { roomName });
+  const onPlayClick = () => {
+    canEdit && socket.emit(PlayerEvent.Play, { roomName });
   };
 
-  const onPause = () => {
-    userCanEdit && socket.emit(PlayerEvent.Pause, { roomName });
+  const onPauseClick = () => {
+    canEdit && socket.emit(PlayerEvent.Pause, { roomName });
   };
 
   const onProgress = ({ playedSeconds }) => {
-    userIsHost && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds }); // TODO: Only host can send his progress time to server
+    canEdit && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds }); // TODO: Only host can send his progress time to server
   };
+
+  if (!videoUrl) {
+    return (
+      <EmptyPlayer
+        isHost={isHost}
+        canEdit={canEdit}
+        onGuestsCanEditClick={onGuestsCanEditClick}
+        guestsCanEdit={guestsCanEdit}
+      />
+    );
+  }
 
   return (
     <ReactPlayer
       ref={playerRef}
-      url="https://www.youtube.com/watch?v=yZwmsfyjGuM&t=1s" // TODO: Retrieve from playlist
+      url={videoUrl}
       width="100%"
       height="100%"
       controls
       playing={playing}
       onReady={onReady}
-      onPlay={onPlay}
-      onPause={onPause}
+      onPlay={onPlayClick}
+      onPause={onPauseClick}
       onProgress={onProgress}
     />
   );

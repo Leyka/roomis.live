@@ -1,6 +1,7 @@
 import { useRootStore } from '@/store';
 import { socket } from '@/utils/socket';
-import { RoomEvent, UserEvent } from '@shared/events';
+import { PlaylistEvent, RoomEvent, UserEvent } from '@shared/events';
+import { Playlist as PlaylistType } from '@shared/types';
 import { kebabCase } from 'lodash';
 import { useObserver } from 'mobx-react-lite';
 import React, { FC, useEffect } from 'react';
@@ -22,9 +23,18 @@ export const Room: FC = () => {
   useEffect(() => {
     socket.emit(UserEvent.Join, { roomName: roomName });
 
+    socket.on(RoomEvent.Update, (room) => roomStore.set(room));
+
     socket.on(UserEvent.Update, (user) => userStore.set(user));
 
-    socket.on(RoomEvent.Update, (room) => roomStore.set(room));
+    socket.on(PlaylistEvent.Update, (playlist: PlaylistType) => {
+      // If we have only one song in playlist, play it now
+      const videos = Object.values(playlist.videos);
+      if (videos.length === 1) {
+        roomStore.videoToPlay = videos[0];
+        roomStore.videoIsPlaying = true;
+      }
+    });
 
     return () => {
       socket.off(UserEvent.Disconnect);
@@ -35,31 +45,48 @@ export const Room: FC = () => {
     socket.emit(RoomEvent.GuestsCanEdit, { canEdit: !roomStore.guestsCanEdit });
   };
 
-  return useObserver(() => {
-    if (!socket) {
-      return <div>Loading...</div>;
-    }
+  const onPlay = () => {
+    roomStore.videoIsPlaying = true;
+  };
 
+  const onPause = () => {
+    roomStore.videoIsPlaying = false;
+  };
+
+  const onInit = (playing: boolean) => {
+    roomStore.videoIsPlaying = playing;
+  };
+
+  return useObserver(() => {
     return (
       <RoomLayout
         header={
           <RoomHeader
             roomName={roomName}
             isHost={userStore.isHost}
+            canEdit={userStore.canEdit}
             userName={userStore.name}
             userColor={userStore.color}
           />
         }
-        playlist={<Playlist canEdit={userStore.canEdit} />}
+        playlist={<Playlist roomName={roomName} canEdit={userStore.canEdit} />}
         player={
           <Player
+            videoUrl={roomStore.videoToPlay?.url}
             roomName={roomName}
-            userCanEdit={userStore.canEdit}
-            userIsHost={userStore.isHost}
+            canEdit={userStore.canEdit}
+            isHost={userStore.isHost}
+            guestsCanEdit={roomStore.guestsCanEdit}
+            onGuestsCanEditClick={onGuestsCanEditClick}
+            playing={roomStore.videoIsPlaying}
+            onInit={onInit}
+            onPlay={onPlay}
+            onPause={onPause}
           />
         }
         controls={
           <Controls
+            hidden={!roomStore.hasVideo}
             isHost={userStore.isHost}
             canEdit={userStore.canEdit}
             usersCount={roomStore.usersCount}

@@ -27,6 +27,7 @@ interface Props {
   userName: string;
   userColor: string;
   isHost: boolean;
+  canEdit: boolean;
 }
 
 const Toast = Toaster.create({
@@ -35,7 +36,7 @@ const Toast = Toaster.create({
 });
 
 export const RoomHeader: FC<Props> = (props) => {
-  const { roomName, userName, userColor, isHost } = props;
+  const { roomName, userName, userColor, isHost, canEdit } = props;
 
   const onCopyIconClick = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -65,7 +66,8 @@ export const RoomHeader: FC<Props> = (props) => {
             <UserIconStyled icon={faUserCircle} /> {userName}
           </HeadingStyled>
           {isHost && <Tag className={Classes.INTENT_DANGER}>Host</Tag>}
-          {!isHost && <Tag>Guest</Tag>}
+          {!isHost && canEdit && <Tag className={Classes.INTENT_PRIMARY}>Super Guest</Tag>}
+          {!isHost && !canEdit && <Tag>Guest</Tag>}
         </Navbar.Group>
       </Navbar>
     </React.Fragment>

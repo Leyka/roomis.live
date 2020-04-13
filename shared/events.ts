@@ -10,11 +10,17 @@ export enum RoomEvent {
 }
 
 export enum PlayerEvent {
-  Ready = 'ready-player',
-  Init = 'init-player',
-  Play = 'play-player',
-  Pause = 'pause-player',
-  Progress = 'progress-player',
+  Ready = 'player-ready',
+  Init = 'player-init',
+  Play = 'player-play',
+  Pause = 'player-pause',
+  Progress = 'player-progress',
+  End = 'player-end',
+}
+
+export enum PlaylistEvent {
+  NewVideo = 'playlist-new-video',
+  Update = 'playlist-update',
 }
 
 export enum LogEvent {

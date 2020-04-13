@@ -13,7 +13,7 @@ const ContainerStyled = styled.div`
 `;
 
 const MessagesStyled = styled.div`
-  height: 70vh;
+  height: 77vh;
   overflow-y: auto;
   padding: 10px;
   vertical-align: baseline;
@@ -21,7 +21,7 @@ const MessagesStyled = styled.div`
 
 const ChatBoxStyled = styled.div`
   padding: 10px;
-  height: 15vh;
+  height: 17vh;
   border-top: 1px solid #d3d4d4;
   display: flex;
   flex-direction: column;

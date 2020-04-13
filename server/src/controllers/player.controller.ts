@@ -36,7 +36,7 @@ export module PlayerController {
 
   export async function onPlayerProgress(socket: Socket, roomName: string, playedSeconds: number) {
     const user = await userModel.get(socket.id);
-    if (!user || !user.isHost) return;
+    if (!user || !user.canEdit) return;
 
     let player = await playerModel.get(roomName);
     player.playedSeconds = playedSeconds;

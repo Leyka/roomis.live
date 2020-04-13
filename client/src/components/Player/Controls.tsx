@@ -5,6 +5,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 
+const ContainerStyled = styled.div`
+  height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  border-left: 1px solid #d3d4d4;
+  border-right: 1px solid #d3d4d4;
+`;
+
 const SkipTextStyled = styled.span`
   margin-right: 5px;
 `;
@@ -32,6 +41,7 @@ const ButtonSkipStyled = styled(Button)`
 `;
 
 interface Props {
+  hidden: boolean;
   canEdit: boolean;
   isHost: boolean;
   guestsCanEdit: boolean;
@@ -40,13 +50,16 @@ interface Props {
 }
 
 export const Controls: FC<Props> = (props) => {
-  const { isHost, canEdit, usersCount, guestsCanEdit, onGuestsCanEditClick } = props;
+  const { hidden, isHost, canEdit, usersCount, guestsCanEdit, onGuestsCanEditClick } = props;
 
   return (
-    <React.Fragment>
-      <ListenersStyled title="Listeners" style={{ color: usersCount > 1 ? '#f44336' : '#505050' }}>
+    <ContainerStyled style={{ display: hidden ? 'none' : 'flex' }}>
+      <ListenersStyled
+        title="watching now"
+        style={{ color: usersCount > 1 ? '#f44336' : '#505050' }}
+      >
         <FontAwesomeIcon icon={faUser} />
-        <CountTextStyled>{usersCount} watching now</CountTextStyled>
+        <CountTextStyled>{usersCount}</CountTextStyled>
       </ListenersStyled>
       <ControlsContainer>
         {isHost && (
@@ -63,6 +76,6 @@ export const Controls: FC<Props> = (props) => {
           </ButtonSkipStyled>
         )}
       </ControlsContainer>
-    </React.Fragment>
+    </ContainerStyled>
   );
 };

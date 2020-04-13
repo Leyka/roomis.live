@@ -1,7 +1,13 @@
+import { useRootStore } from '@/store';
+import { socket } from '@/utils/socket';
+import { isValidYouTubeUrl } from '@/utils/validator';
 import { Button, Divider, H4 } from '@blueprintjs/core';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { FC, useState } from 'react';
+import { PlaylistEvent } from '@shared/events';
+import { Source } from '@shared/types';
+import { useObserver } from 'mobx-react-lite';
+import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AddVideo } from './AddVideo';
 
@@ -14,6 +20,8 @@ const PlaylistHeader = styled.div`
 
 const H4Styled = styled(H4)`
   margin: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
 `;
 
 const AddIconStyled = styled(FontAwesomeIcon)`
@@ -25,14 +33,46 @@ const ContainerStyled = styled.div`
 `;
 
 interface Props {
+  roomName: string;
   canEdit: boolean;
 }
 
 export const Playlist: FC<Props> = (props) => {
+  const { playlistStore } = useRootStore();
   const [addClicked, setAddClicked] = useState(false);
-  const { canEdit } = props;
+  const [isValidYoutubeUrl, setIsValidYoutubeUrl] = useState(false);
+  const { canEdit, roomName } = props;
 
-  return (
+  useEffect(() => {
+    socket.on(PlaylistEvent.Update, (playlist) => playlistStore.set(playlist));
+  }, [playlistStore]);
+
+  const validateUrl = (url: string) => {
+    const isValidYouTube = isValidYouTubeUrl(url);
+    setIsValidYoutubeUrl(isValidYouTube);
+  };
+
+  const onAddVideoClick = (videoUrl: string) => {
+    const isValid = isValidYouTubeUrl;
+    if (!isValid) return;
+
+    // In future, we will support SoundCloud and other providers
+    let source;
+    if (isValidYoutubeUrl) {
+      source = Source.Youtube;
+    }
+
+    socket.emit(PlaylistEvent.NewVideo, { roomName, source, videoUrl });
+    setAddClicked(false);
+    setIsValidYoutubeUrl(false);
+  };
+
+  const onCancelClick = () => {
+    setAddClicked(false);
+    setIsValidYoutubeUrl(false);
+  };
+
+  return useObserver(() => (
     <div>
       <PlaylistHeader>
         <H4Styled>Playlist</H4Styled>
@@ -46,11 +86,12 @@ export const Playlist: FC<Props> = (props) => {
       <ContainerStyled>
         <AddVideo
           hidden={!canEdit || !addClicked}
-          isValid
-          onAddClick={(text) => console.log('Added', text)}
-          onCancelClick={() => setAddClicked(false)}
+          isYoutubeUrl={isValidYoutubeUrl}
+          validateUrl={validateUrl}
+          onAddClick={onAddVideoClick}
+          onCancelClick={onCancelClick}
         />
       </ContainerStyled>
     </div>
-  );
+  ));
 };

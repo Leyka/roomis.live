@@ -7,8 +7,8 @@ export interface Player {
 }
 
 export enum Source {
-  Youtube,
-  SoundCloud,
+  Youtube = 'youtube',
+  SoundCloud = 'soundcloud',
 }
 
 export interface Video {

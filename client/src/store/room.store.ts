@@ -1,5 +1,5 @@
-import { Room } from '@shared/types';
-import { action, observable } from 'mobx';
+import { Room, Video } from '@shared/types';
+import { action, computed, observable } from 'mobx';
 import { RootStore } from './index';
 
 export class RoomStore {
@@ -11,10 +11,16 @@ export class RoomStore {
   @observable roomName: string = '';
   @observable usersCount: number = 1;
   @observable guestsCanEdit: boolean = false;
+  @observable videoToPlay: Video | undefined;
+  @observable videoIsPlaying: boolean = false;
 
   @action set(room: Room) {
     this.roomName = room.name;
     this.usersCount = room.userIds.length;
     this.guestsCanEdit = room.guestsCanEdit;
+  }
+
+  @computed get hasVideo() {
+    return !!(this.videoToPlay && this.videoToPlay.url);
   }
 }
