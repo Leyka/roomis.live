@@ -33,6 +33,11 @@ const ContainerStyled = styled.div`
   margin-top: 15px;
 `;
 
+const SmallTextPlaylistStyled = styled.small`
+  color: #a9a9a9;
+  margin-bottom: 5px;
+`;
+
 interface Props {
   roomName: string;
   canEdit: boolean;
@@ -51,7 +56,7 @@ export const Playlist: FC<Props> = (props) => {
 
   useEffect(() => {
     const updateIsMediumScreen = () => {
-      setIsMediumScreen(window.innerWidth >= 768 && window.innerWidth <= 1200);
+      setIsMediumScreen(window.innerWidth >= 768 && window.innerWidth < 1200);
     };
 
     updateIsMediumScreen();
@@ -93,7 +98,8 @@ export const Playlist: FC<Props> = (props) => {
 
   return useObserver(() => (
     <div>
-      <PlaylistHeader>
+      <PlaylistHeader style={{ flexDirection: isMediumScreen ? 'column' : 'row' }}>
+        {isMediumScreen && <SmallTextPlaylistStyled>PLAYLIST</SmallTextPlaylistStyled>}
         {!isMediumScreen && <H4Styled>Playlist</H4Styled>}
         {canEdit && (
           <Button minimal onClick={() => setAddClicked(true)} title="Add new video to playlist">

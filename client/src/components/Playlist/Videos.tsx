@@ -33,6 +33,7 @@ export const Videos: FC<VideosProps> = (props) => {
               key={video.id}
               onDeleteVideoClick={onDeleteVideoClick}
               videoPlayingId={videoPlayingId}
+              isMediumScreen={isMediumScreen}
             />
           ))}
         </div>
@@ -60,6 +61,12 @@ const ThumbnailStyled = styled.img`
   margin-right: 5px;
 `;
 
+const RoundThumbnailStyled = styled.img`
+  text-align: center;
+  width: 40px;
+  border-radius: 20%;
+`;
+
 const ChannelTitleStyled = styled.p`
   font-size: 0.75rem;
   color: #616161;
@@ -77,12 +84,21 @@ interface VideoCardProps {
   video: Video;
   videoPlayingId?: string;
   onDeleteVideoClick(videoId: string): void;
+  isMediumScreen: boolean;
 }
 
 export const VideoCard: FC<VideoCardProps> = (props) => {
-  const { video, videoPlayingId, onDeleteVideoClick } = props;
+  const { video, videoPlayingId, onDeleteVideoClick, isMediumScreen } = props;
 
   const playing = videoPlayingId && videoPlayingId === video.id;
+
+  if (isMediumScreen) {
+    return (
+      <div>
+        <RoundThumbnailStyled src={video.thumbnail} />
+      </div>
+    );
+  }
 
   return (
     <VideoCardStyled
@@ -92,7 +108,7 @@ export const VideoCard: FC<VideoCardProps> = (props) => {
     >
       <TwoColumnsStyled>
         <div>
-          <ThumbnailStyled src={video.thumbnail} width="80" />
+          <ThumbnailStyled src={video.thumbnail} />
         </div>
         <div>
           <span>{video.title}</span>
