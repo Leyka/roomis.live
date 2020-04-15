@@ -1,7 +1,7 @@
-# Node.js
 **/.vscode
 **/node_modules
 **/dist
 **/build
 **/coverage
 *.log
+*.env
