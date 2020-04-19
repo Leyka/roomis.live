@@ -58,5 +58,6 @@ export interface ChatMessage {
   content: string;
   date: Date;
   fromServer: boolean;
-  fromUserId?: string;
+  userName: string;
+  userColor: string;
 }

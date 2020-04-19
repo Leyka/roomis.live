@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { LogEvent, UserEvent } from '../../../shared/events';
+import { ChatEvent, UserEvent } from '../../../shared/events';
 import { roomModel, userModel } from '../models';
 import { logger } from '../utils/logger';
 import { PlaylistEvent, RoomEvent } from './../../../shared/events';
@@ -25,10 +25,10 @@ export module RoomController {
     socket.emit(UserEvent.Update, user);
     socket.emit(PlaylistEvent.Update, playlist);
     io.in(user.room).emit(RoomEvent.Update, room);
-    socket.emit(LogEvent.Send, chatModel.createServerMessage(`Welcome to the room !`));
+    socket.emit(ChatEvent.NewMessage, chatModel.createServerMessage(`Welcome to the room !`));
     socket.broadcast
       .to(user.room)
-      .emit(LogEvent.Send, chatModel.createServerMessage(`${user.name} joined the room`));
+      .emit(ChatEvent.NewMessage, chatModel.createServerMessage(`${user.name} joined the room`));
 
     logger.info(`User ${JSON.stringify(user)} joined room ${user.room}`);
   }
@@ -60,7 +60,7 @@ export module RoomController {
 
     socket.broadcast
       .to(leavingUser.room)
-      .emit(LogEvent.Send, chatModel.createServerMessage(messageToTheRoom));
+      .emit(ChatEvent.NewMessage, chatModel.createServerMessage(messageToTheRoom));
 
     socket.broadcast.to(leavingUser.room).emit(RoomEvent.Update, room);
 
@@ -86,6 +86,6 @@ export module RoomController {
     const message = canEdit
       ? 'Guests can now edit playlist and player 🥳'
       : 'Host revoked the editing access';
-    io.in(user.room).emit(LogEvent.Send, chatModel.createServerMessage(message));
+    io.in(user.room).emit(ChatEvent.NewMessage, chatModel.createServerMessage(message));
   }
 }

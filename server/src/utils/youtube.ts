@@ -1,8 +1,8 @@
 import * as SimpleYouTubeAPI from 'simple-youtube-api';
 import { VideoInfos } from '../../../shared/types';
-import { YOUTUBE_API_KEY } from '../config';
+import { YOUTUBE_API } from '../config';
 
-const youtube = new SimpleYouTubeAPI(YOUTUBE_API_KEY);
+const youtube = new SimpleYouTubeAPI(YOUTUBE_API);
 
 export module YouTube {
   export async function getVideoInfos(url: string) {

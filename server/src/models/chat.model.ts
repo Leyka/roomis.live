@@ -6,17 +6,23 @@ class ChatModel {
     return this.createMessage(content, true);
   }
 
-  createUserMessage(content: string, fromUserId: string) {
-    return this.createMessage(content, false, fromUserId);
+  createUserMessage(content: string, userName: string, userColor: string) {
+    return this.createMessage(content, false, userName, userColor);
   }
 
-  private createMessage(content: string, fromServer: boolean, fromUserId?: string) {
+  private createMessage(
+    content: string,
+    fromServer: boolean,
+    userName?: string,
+    userColor?: string
+  ) {
     const message: ChatMessage = {
       id: uuidv4(),
       date: new Date(),
       content,
-      fromUserId,
       fromServer,
+      userName,
+      userColor,
     };
     return message;
   }

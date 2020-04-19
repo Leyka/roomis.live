@@ -26,10 +26,7 @@ export enum PlaylistEvent {
   SkipVideo = 'playlist-skip-video',
 }
 
-export enum LogEvent {
-  Send = 'send-log',
-}
-
 export enum ChatEvent {
-  Send = 'send-chat',
+  Send = 'chat-send',
+  NewMessage = 'chat-new-msg',
 }

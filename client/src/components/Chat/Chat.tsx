@@ -1,6 +1,6 @@
 import { socket } from '@/utils/socket';
 import { Button, Checkbox, TextArea } from '@blueprintjs/core';
-import { LogEvent } from '@shared/events';
+import { ChatEvent } from '@shared/events';
 import { ChatMessage } from '@shared/types';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -52,7 +52,7 @@ export const Chat: FC = () => {
   const messagesEndRef = useRef<any>(null);
 
   useEffect(() => {
-    socket.on(LogEvent.Send, (message: ChatMessage) =>
+    socket.on(ChatEvent.NewMessage, (message: ChatMessage) =>
       setMessages((messages) => [...messages, message])
     );
   }, []);
@@ -73,7 +73,7 @@ export const Chat: FC = () => {
 
   const sendMessage = () => {
     if (!message) return;
-    console.log('Sending message...', message);
+    socket.emit(ChatEvent.Send, { message });
     setMessage('');
   };
 
@@ -92,7 +92,7 @@ export const Chat: FC = () => {
           return message.fromServer ? (
             <ServerMessage key={message.id} content={message.content} />
           ) : (
-            <p key={message.id}>{message.content}</p>
+            <UserMessage key={message.id} message={message} />
           );
         })}
         <div ref={messagesEndRef} />
@@ -119,12 +119,28 @@ export const Chat: FC = () => {
   );
 };
 
+// Message sent from server
+
 const ServerMessageSyled = styled.p`
   color: #797979;
   font-size: 12px;
   font-weight: 300;
 `;
 
-export const ServerMessage = ({ content }) => {
+const ServerMessage = ({ content }) => {
   return <ServerMessageSyled>{content}</ServerMessageSyled>;
+};
+
+// Message sent from user
+interface UserMessageProps {
+  message: ChatMessage;
+}
+
+const UserMessage: FC<UserMessageProps> = ({ message }) => {
+  return (
+    <p>
+      <strong style={{ color: `#${message.userColor}` }}>{message.userName}</strong>
+      {` : ${message.content}`}
+    </p>
+  );
 };

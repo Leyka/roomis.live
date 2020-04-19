@@ -40,7 +40,7 @@ class RoomModel extends BaseModel<Room> {
     if (Object.keys(room.userIds).length === 0) {
       this.remove(roomName);
       playerModel.remove(roomName);
-      playerModel.remove(roomName);
+      playlistModel.remove(roomName);
       return undefined;
     }
 
