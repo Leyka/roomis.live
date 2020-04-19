@@ -1,5 +1,5 @@
 import { socket } from '@/utils/socket';
-import { Button, Checkbox, TextArea } from '@blueprintjs/core';
+import { Button, TextArea } from '@blueprintjs/core';
 import { ChatEvent } from '@shared/events';
 import { ChatMessage } from '@shared/types';
 import React, { FC, useEffect, useRef, useState } from 'react';
@@ -40,15 +40,9 @@ const ChatActionStyled = styled.div`
   align-items: center;
 `;
 
-const CheckboxStyled = styled(Checkbox)`
-  margin-bottom: 0;
-  font-size: 13px;
-`;
-
 export const Chat: FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState('');
-  const [sendWithEnterKey, setSendWithEnterKey] = useState(true);
   const messagesEndRef = useRef<any>(null);
 
   useEffect(() => {
@@ -78,7 +72,7 @@ export const Chat: FC = () => {
   };
 
   const onKeyPress = (e) => {
-    if (e.which === 13 && sendWithEnterKey && !e.shiftKey) {
+    if (e.which === 13 && !e.shiftKey) {
       // Enter key
       e.preventDefault();
       sendMessage();
@@ -107,11 +101,6 @@ export const Chat: FC = () => {
           value={message}
         />
         <ChatActionStyled>
-          <CheckboxStyled
-            checked={sendWithEnterKey}
-            onChange={() => setSendWithEnterKey(!sendWithEnterKey)}
-            label="Send with enter key"
-          />
           <Button text="Send" small onClick={sendMessage} />
         </ChatActionStyled>
       </ChatBoxStyled>
