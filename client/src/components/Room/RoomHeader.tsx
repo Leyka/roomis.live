@@ -3,6 +3,7 @@ import { faCopy, faUserCircle } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { FC } from 'react';
 import styled from 'styled-components';
+import { copyToClipboard } from '@/utils/clipboard';
 
 const HeadingStyled = styled(Navbar.Heading)`
   font-size: 1.25rem;
@@ -44,7 +45,8 @@ export const RoomHeader: FC<Props> = (props) => {
   const { roomName, userName, userColor, isHost, canEdit } = props;
 
   const onCopyIconClick = () => {
-    navigator.clipboard.writeText(window.location.href);
+    copyToClipboard(window.location.href);
+
     Toast.show({
       message: 'Room link copied!',
       intent: 'success',
