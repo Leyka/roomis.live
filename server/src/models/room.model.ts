@@ -14,7 +14,7 @@ class RoomModel extends BaseModel<Room> {
     } else {
       // New
       room = this.createRoom(roomName, userId);
-      playerModel.createPlayer(roomName);
+      playerModel.createPlayer(roomName, room.hostId);
       playlistModel.createPlaylist(roomName);
     }
 
@@ -52,6 +52,7 @@ class RoomModel extends BaseModel<Room> {
       // Update user
       let newHost = await userModel.get(newHostId);
       newHost.isHost = true;
+      newHost.canEdit = true;
       userModel.save(newHost);
     }
 
