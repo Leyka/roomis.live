@@ -3,7 +3,8 @@ export interface Player {
   isPlaying: boolean;
   playedSeconds: number;
   videoUrl?: string;
-  lastTimeCheck?: Date;
+  /** Last user id that asked to seek becomes the new reference that we listen onProgress */
+  lastSeekUserId: string;
 }
 
 export enum Source {

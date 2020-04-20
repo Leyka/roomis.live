@@ -19,6 +19,7 @@ export const Player: FC<Props> = (props) => {
 
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
+  const [isLastSeeker, setIsLastSeeker] = useState(false);
 
   useEffect(() => {
     socket.on(PlayerEvent.Init, (playerState: PlayerType) => {
@@ -27,10 +28,14 @@ export const Player: FC<Props> = (props) => {
       }
 
       setPlaying(playerState.isPlaying);
+      setIsLastSeeker(playerState.lastSeekUserId === socket.id);
     });
 
-    socket.on(PlayerEvent.Play, ({ playedSeconds }) => {
+    socket.on(PlayerEvent.Play, ({ playedSeconds, lastSeekUserId }) => {
       setPlaying(true);
+      setIsLastSeeker(lastSeekUserId === socket.id);
+
+      // Adjust player time
       const currentTime = playerRef.current!.getCurrentTime();
       const synced = Math.round(currentTime) === Math.round(playedSeconds);
       if (!synced) {
@@ -39,7 +44,7 @@ export const Player: FC<Props> = (props) => {
     });
 
     socket.on(PlayerEvent.Pause, () => setPlaying(false));
-  }, [playing]);
+  }, [playing, isLastSeeker]);
 
   const onReady = () => {
     socket.emit(PlayerEvent.Ready, { roomName });
@@ -54,7 +59,16 @@ export const Player: FC<Props> = (props) => {
   };
 
   const onProgress = ({ playedSeconds }) => {
-    canEdit && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds }); // TODO: Only host can send his progress time to server
+    // Our progress reference is the last user that asked to seek
+    /*
+    console.log({ isLastSeeker });
+    if (!updated) {
+      console.log('not updated');
+      playerRef.current?.forceUpdate();
+      setUpdated(true);
+    }
+    */
+    isLastSeeker && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds });
   };
 
   if (!videoUrl) {

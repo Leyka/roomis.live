@@ -12,13 +12,18 @@ export module PlayerController {
     const user = await userModel.get(socket.id);
     if (!user || !user.canEdit) return;
 
-    // Send message to other users in the same room that we asked to Play
-    let player = await playerModel.get(roomName);
-    socket.broadcast.to(roomName).emit(PlayerEvent.Play, { playedSeconds: player.playedSeconds });
-
     // Update player in DB
+    let player = await playerModel.get(roomName);
     player.isPlaying = true;
+    player.lastSeekUserId = user.id;
     playerModel.save(player);
+    // Send message to other users in the same room that we asked to Play
+    socket.broadcast
+      .to(roomName)
+      .emit(PlayerEvent.Play, {
+        playedSeconds: player.playedSeconds,
+        lastSeekUserId: player.lastSeekUserId,
+      });
   }
 
   export async function onPlayerPause(socket: Socket, roomName: string) {

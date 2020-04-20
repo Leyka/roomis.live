@@ -5,11 +5,12 @@ import { Player } from './../../../shared/types';
 
 /** A Player is associated to a room */
 class PlayerModel extends BaseModel<Player> {
-  createPlayer(roomName: string) {
+  createPlayer(roomName: string, hostUserId: string) {
     const player: Player = {
       id: roomName,
       isPlaying: false,
       playedSeconds: 0,
+      lastSeekUserId: hostUserId,
     };
 
     this.save(player);

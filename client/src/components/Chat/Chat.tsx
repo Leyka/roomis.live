@@ -34,12 +34,6 @@ const TextAreaStyle = styled(TextArea)`
   margin-bottom: 5px;
 `;
 
-const ChatActionStyled = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 export const Chat: FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState('');
@@ -100,9 +94,9 @@ export const Chat: FC = () => {
           onChange={(e) => setMessage(e.target.value)}
           value={message}
         />
-        <ChatActionStyled>
+        <div>
           <Button text="Send" small onClick={sendMessage} />
-        </ChatActionStyled>
+        </div>
       </ChatBoxStyled>
     </ContainerStyled>
   );
