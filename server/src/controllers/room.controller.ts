@@ -84,7 +84,7 @@ export module RoomController {
     });
 
     const message = canEdit
-      ? 'Guests can now edit playlist and player 🥳'
+      ? 'Guests can now add/play/pause video 🥳'
       : 'Host revoked the editing access';
     io.in(user.room).emit(ChatEvent.NewMessage, chatModel.createServerMessage(message));
   }

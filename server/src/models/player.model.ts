@@ -10,7 +10,6 @@ class PlayerModel extends BaseModel<Player> {
       id: roomName,
       isPlaying: false,
       playedSeconds: 0,
-      lastSeekUserId: hostUserId,
     };
 
     this.save(player);

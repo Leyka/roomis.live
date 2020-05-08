@@ -19,21 +19,17 @@ export const Player: FC<Props> = (props) => {
 
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
-  const [isLastSeeker, setIsLastSeeker] = useState(false);
 
   useEffect(() => {
-    socket.on(PlayerEvent.Init, (playerState: PlayerType) => {
-      if (playerState.playedSeconds !== 0) {
-        playerRef.current?.seekTo(playerState.playedSeconds);
+    socket.on(PlayerEvent.Init, (player: PlayerType) => {
+      if (player.playedSeconds !== 0) {
+        playerRef.current?.seekTo(player.playedSeconds);
       }
-
-      setPlaying(playerState.isPlaying);
-      setIsLastSeeker(playerState.lastSeekUserId === socket.id);
+      setPlaying(player.isPlaying);
     });
 
-    socket.on(PlayerEvent.Play, ({ playedSeconds, lastSeekUserId }) => {
+    socket.on(PlayerEvent.Play, ({ playedSeconds }) => {
       setPlaying(true);
-      setIsLastSeeker(lastSeekUserId === socket.id);
 
       // Adjust player time
       const currentTime = playerRef.current!.getCurrentTime();
@@ -44,7 +40,7 @@ export const Player: FC<Props> = (props) => {
     });
 
     socket.on(PlayerEvent.Pause, () => setPlaying(false));
-  }, [playing, isLastSeeker]);
+  }, [playing]);
 
   const onReady = () => {
     socket.emit(PlayerEvent.Ready, { roomName });
@@ -59,16 +55,8 @@ export const Player: FC<Props> = (props) => {
   };
 
   const onProgress = ({ playedSeconds }) => {
-    // Our progress reference is the last user that asked to seek
-    /*
-    console.log({ isLastSeeker });
-    if (!updated) {
-      console.log('not updated');
-      playerRef.current?.forceUpdate();
-      setUpdated(true);
-    }
-    */
-    isLastSeeker && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds });
+    // TODO: Store variable locally of played or maybe useRef
+    isHost && socket.emit(PlayerEvent.Progress, { roomName, playedSeconds });
   };
 
   if (!videoUrl) {

@@ -15,15 +15,11 @@ export module PlayerController {
     // Update player in DB
     let player = await playerModel.get(roomName);
     player.isPlaying = true;
-    player.lastSeekUserId = user.id;
     playerModel.save(player);
     // Send message to other users in the same room that we asked to Play
-    socket.broadcast
-      .to(roomName)
-      .emit(PlayerEvent.Play, {
-        playedSeconds: player.playedSeconds,
-        lastSeekUserId: player.lastSeekUserId,
-      });
+    socket.broadcast.to(roomName).emit(PlayerEvent.Play, {
+      playedSeconds: player.playedSeconds,
+    });
   }
 
   export async function onPlayerPause(socket: Socket, roomName: string) {
@@ -41,7 +37,7 @@ export module PlayerController {
 
   export async function onPlayerProgress(socket: Socket, roomName: string, playedSeconds: number) {
     const user = await userModel.get(socket.id);
-    if (!user || !user.canEdit) return;
+    if (!user || !user.isHost) return;
 
     let player = await playerModel.get(roomName);
     player.playedSeconds = playedSeconds;
