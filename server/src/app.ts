@@ -15,7 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Sockets with socket.io
-export const io = socketio(server);
+export const io = socketio(server, {
+  origins: '*:*',
+  cookie: false,
+});
+
 io.on('connection', dispatchEvents);
 
 // Logging
