@@ -18,10 +18,12 @@ export const Room: FC = () => {
   const { roomName } = roomStore;
   // Returns name of the room that users entered in URL bar
   const { name } = useParams();
-  roomStore.roomName = kebabCase(name);
+  const roomNameFromUrl = kebabCase(name);
+  roomStore.roomName = roomNameFromUrl;
 
   useEffect(() => {
-    socket.emit(UserEvent.Join, { roomName: roomName });
+    document.title = `${roomNameFromUrl} | Room Is Live`;
+    socket.emit(UserEvent.Join, { roomName: roomNameFromUrl });
 
     socket.on(RoomEvent.Update, (room) => roomStore.set(room));
 
@@ -41,7 +43,8 @@ export const Room: FC = () => {
     return () => {
       socket.off(UserEvent.Disconnect);
     };
-  }, [roomName, userStore, roomStore]);
+    // eslint-disable-next-line
+  }, []);
 
   const onGuestsCanEditClick = () => {
     socket.emit(RoomEvent.GuestsCanEdit, { canEdit: !roomStore.guestsCanEdit });

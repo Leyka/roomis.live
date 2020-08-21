@@ -16,7 +16,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Sockets with socket.io
 export const io = socketio(server, {
-  origins: '*:*',
   cookie: false,
 });
 
