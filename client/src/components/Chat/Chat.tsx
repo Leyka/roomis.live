@@ -30,7 +30,7 @@ const ChatBoxStyled = styled.div`
 
 const TextAreaStyle = styled(TextArea)`
   resize: none;
-  font-family: sans-serif;
+  font-family: Arial, sans-serif;
   margin-bottom: 5px;
 `;
 
@@ -106,7 +106,7 @@ export const Chat: FC = () => {
 
 const ServerMessageSyled = styled.p`
   color: #797979;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 300;
 `;
 
@@ -122,8 +122,8 @@ interface UserMessageProps {
 const UserMessage: FC<UserMessageProps> = ({ message }) => {
   return (
     <p>
-      <strong style={{ color: `#${message.userColor}` }}>{message.userName}</strong>
-      {` : ${message.content}`}
+      <strong style={{ color: `#${message.userColor}` }}>{message.userName}:</strong>
+      {` ${message.content}`}
     </p>
   );
 };
