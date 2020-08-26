@@ -95,7 +95,7 @@ export const Chat: FC = () => {
           value={message}
         />
         <div>
-          <Button text="Send" small onClick={sendMessage} />
+          <Button text="Send" onClick={sendMessage} />
         </div>
       </ChatBoxStyled>
     </ContainerStyled>

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const NonIdealStateStyled = styled(NonIdealState)`
   h4,
   p {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 `;
 
@@ -39,7 +39,7 @@ export const EmptyPlayer: FC<Props> = (props) => {
 
   return (
     <NonIdealStateStyled
-      className="sans-serif"
+      className="serif"
       title="Looks like it's empty"
       icon="video"
       description={<p>{message}</p>}
@@ -58,7 +58,12 @@ const EmptyPlayerAction: FC<Partial<Props>> = (props) => {
   const { isHost, guestsCanEdit, onGuestsCanEditClick } = props;
   if (isHost) {
     return (
-      <Switch checked={guestsCanEdit} label="Guests can edit" onChange={onGuestsCanEditClick} />
+      <Switch
+        checked={guestsCanEdit}
+        label="Guests can edit"
+        onChange={onGuestsCanEditClick}
+        large
+      />
     );
   }
   return null;

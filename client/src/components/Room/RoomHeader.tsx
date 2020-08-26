@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { copyToClipboard } from '@/utils/clipboard';
 
 const HeadingStyled = styled(Navbar.Heading)`
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
 `;
 
@@ -59,7 +59,7 @@ export const RoomHeader: FC<Props> = (props) => {
     <React.Fragment>
       <Navbar>
         <Navbar.Group align={Alignment.LEFT}>
-          <HeadingStyled className="sans-serif">
+          <HeadingStyled className="serif">
             #{roomName}
             <CopyIconStyled
               icon={faCopy}
@@ -69,7 +69,7 @@ export const RoomHeader: FC<Props> = (props) => {
           </HeadingStyled>
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
-          <HeadingStyled className="sans-serif" style={{ color: `#${userColor}` }}>
+          <HeadingStyled className="serif" style={{ color: `#${userColor}` }}>
             <UserIconStyled icon={faUserCircle} /> {userName}
           </HeadingStyled>
           {isHost && (

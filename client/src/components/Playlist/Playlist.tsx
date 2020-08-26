@@ -27,7 +27,7 @@ const H4Styled = styled(H4)`
 `;
 
 const AddIconStyled = styled(FontAwesomeIcon)`
-  font-size: 1.25rem;
+  font-size: 1.5rem;
 `;
 
 const ContainerStyled = styled.div`
